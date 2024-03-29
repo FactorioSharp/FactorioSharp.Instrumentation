@@ -5,7 +5,7 @@ Collect metrics and traces from a factorio server through an RCON connection.
 ## Quick start
 
 The RCON interface must be enabled when running factorio. It must also be secured using a password.
-Add the following parameters to the factorio launch command: `--rcon-port 25575 --rcon-password factory`
+Add the following parameters to the factorio launch command: `--rcon-port 27015 --rcon-password factory`
 
 For example
 ```
@@ -55,7 +55,7 @@ HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddOpenTelemetry()
     .WithMetrics(
         metrics => metrics.ConfigureResource(resource => resource.AddService(serviceName, serviceVersion))
-                          .AddFactorioInstrumentation("127.0.0.1", "password")
+                          .AddFactorioInstrumentation("127.0.0.1", 27015, "password")
                           .AddConsoleExporter()
     );
 

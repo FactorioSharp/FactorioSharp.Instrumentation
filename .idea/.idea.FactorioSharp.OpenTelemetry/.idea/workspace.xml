@@ -7,9 +7,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="75a2a7de-c319-418d-9bb5-ebb378c40764" name="Changes" comment="add first factorio metric">
+    <list default="true" id="75a2a7de-c319-418d-9bb5-ebb378c40764" name="Changes" comment="add readme">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.FactorioSharp.OpenTelemetry/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.FactorioSharp.OpenTelemetry/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FactorioSharp.Instrumentation.Console/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/FactorioSharp.Instrumentation.Console/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,6 +24,7 @@
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/9f4b1f5d664afdfc80e1508ab7ed099dff210fbd/src/libraries/System.Diagnostics.DiagnosticSource/src/System/Diagnostics/Metrics/Meter.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/9f4b1f5d664afdfc80e1508ab7ed099dff210fbd/src/libraries/System.Diagnostics.DiagnosticSource/src/System/Diagnostics/Metrics/ObservableUpDownCounter.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/9b350cd7470b4143862ea0e766a3c8edbda00/ca/e0c04f37/LuaCustomTable`2.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock://D:/source/repos/FactorioSharp.OpenTelemetry/FactorioSharp.Instrumentation.Console/Program.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -90,7 +91,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1711747353555</updated>
-      <workItem from="1711747354845" duration="9024000" />
+      <workItem from="1711747354845" duration="9102000" />
     </task>
     <task id="LOCAL-00001" summary="add first factorio metric">
       <option name="closed" value="true" />
@@ -100,7 +101,15 @@
       <option name="project" value="LOCAL" />
       <updated>1711755614529</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="add readme">
+      <option name="closed" value="true" />
+      <created>1711756459215</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1711756459215</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -121,7 +130,8 @@
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
     <MESSAGE value="add first factorio metric" />
-    <option name="LAST_COMMIT_MESSAGE" value="add first factorio metric" />
+    <MESSAGE value="add readme" />
+    <option name="LAST_COMMIT_MESSAGE" value="add readme" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
