@@ -7,15 +7,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="75a2a7de-c319-418d-9bb5-ebb378c40764" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/FactorioSharp.Instrumentation.Console/FactorioSharp.Instrumentation.Console.csproj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/FactorioSharp.Instrumentation.sln" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/FactorioSharp.Instrumentation/Extensions/TaskExtensions.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/FactorioSharp.Instrumentation/FactorioSharp.Instrumentation.csproj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/FactorioSharp.Instrumentation/Meters/FactorioInstrumentationMeterProviderBuilderExtensions.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/FactorioSharp.Instrumentation/Meters/FactorioMetersOptions.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/FactorioSharp.Instrumentation/Meters/FactorioMetrics.cs" afterDir="false" />
+    <list default="true" id="75a2a7de-c319-418d-9bb5-ebb378c40764" name="Changes" comment="add first factorio metric">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.FactorioSharp.OpenTelemetry/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.FactorioSharp.OpenTelemetry/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FactorioSharp.Instrumentation.Console/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/FactorioSharp.Instrumentation.Console/Program.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,11 +18,15 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="SET_USER_NAME_GLOBALLY" value="false" />
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/9f4b1f5d664afdfc80e1508ab7ed099dff210fbd/src/libraries/System.Diagnostics.DiagnosticSource/src/System/Diagnostics/Metrics/Meter.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/9f4b1f5d664afdfc80e1508ab7ed099dff210fbd/src/libraries/System.Diagnostics.DiagnosticSource/src/System/Diagnostics/Metrics/ObservableUpDownCounter.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/9b350cd7470b4143862ea0e766a3c8edbda00/ca/e0c04f37/LuaCustomTable`2.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/9b350cd7470b4143862ea0e766a3c8edbda00/ca/e0c04f37/LuaCustomTable`2.cs" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo"><![CDATA[{
@@ -45,7 +43,7 @@
     ".NET Project.Console.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
+    "git-widget-placeholder": "main",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -92,8 +90,17 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1711747353555</updated>
-      <workItem from="1711747354845" duration="8178000" />
+      <workItem from="1711747354845" duration="9024000" />
     </task>
+    <task id="LOCAL-00001" summary="add first factorio metric">
+      <option name="closed" value="true" />
+      <created>1711755614529</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1711755614529</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -113,6 +120,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+    <MESSAGE value="add first factorio metric" />
+    <option name="LAST_COMMIT_MESSAGE" value="add first factorio metric" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -142,6 +151,19 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/FactorioSharp.Instrumentation/Meters/FactorioMetrics.cs</url>
+          <line>23</line>
+          <properties documentPath="D:\source\repos\FactorioSharp.OpenTelemetry\FactorioSharp.Instrumentation\Meters\FactorioMetrics.cs" initialLine="23" containingFunctionPresentation="Constructor 'FactorioMetrics'">
+            <startOffsets>
+              <option value="772" />
+            </startOffsets>
+            <endOffsets>
+              <option value="791" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="3" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
