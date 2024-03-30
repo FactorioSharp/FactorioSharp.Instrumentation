@@ -26,11 +26,7 @@ public class FactorioMetrics : IDisposable
 
     public void Initialize()
     {
-        new FactorioInstrumentBuilder<int>(_factorioClient, InstrumentType.Gauge, "factorio.server.status", g => 1, description: "Is the server running: 1 (true) or 0 (false)")
-        {
-            Log = _loggerFactory?.CreateLogger("factorio.server.status"),
-            OnException = BehaviorOnException.ReturnDefault
-        }.Build(MeterInstance);
+        MeterInstance.CreateObservableGauge("factorio.server.status", () => _factorioClient.Connected ? 1 : 0, description: "Is the server running: 1 (true) or 0 (false)");
 
         new FactorioInstrumentBuilder<int>(
             _factorioClient,

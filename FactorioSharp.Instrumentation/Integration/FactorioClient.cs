@@ -2,6 +2,7 @@
 using FactorioSharp.Instrumentation.Extensions;
 using FactorioSharp.Rcon;
 using FactorioSharp.Rcon.Model;
+using Microsoft.Extensions.Logging;
 
 namespace FactorioSharp.Instrumentation.Integration;
 
@@ -17,34 +18,55 @@ namespace FactorioSharp.Instrumentation.Integration;
 class FactorioClient
 {
     FactorioRconClient? _cachedClient;
+    DateTime _lastConnectionAttemptDate = DateTime.MinValue;
     readonly string _host;
     readonly int _port;
     readonly string _password;
+    readonly ILogger<FactorioRconClient>? _logger;
 
     /// <summary>
     ///     Ensure that there is at most one connection attempt being performed simultaneously on the <see cref="_cachedClient" />.
     /// </summary>
     readonly object _clientConnectionLock = new();
 
-    public FactorioClient(string host, int port, string password)
+    public FactorioClient(string host, int port, string password, ILogger<FactorioRconClient>? logger = null)
     {
         _host = host;
         _port = port;
         _password = password;
+        _logger = logger;
+
+        _cachedClient = GetConnectedClient();
     }
 
-    public async Task<T> ReadAsync<T>(Expression<Func<FactorioRconGlobals, T>> command) => await GetConnectedClient().ReadAsync(command);
+    public bool Connected => _cachedClient is { Connected: true };
 
-    public async Task ExecuteAsync(Expression<Action<FactorioRconGlobals>> command) => await GetConnectedClient().ExecuteAsync(command);
+    /// <summary>
+    ///     The minimum amount of time to wait for before trying to reconnect again when it fails
+    /// </summary>
+    public TimeSpan MinReconnectionDelay { get; set; } = TimeSpan.FromSeconds(1);
+
+    public async Task<T> ReadAsync<T>(Expression<Func<FactorioRconGlobals, T>> command) => await RequireConnectedClient().ReadAsync(command);
+
+    public async Task ExecuteAsync(Expression<Action<FactorioRconGlobals>> command) => await RequireConnectedClient().ExecuteAsync(command);
 
     public void Disconnect() => _cachedClient?.Disconnect();
 
-    public FactorioRconClient GetConnectedClient()
+    FactorioRconClient RequireConnectedClient() => GetConnectedClient() ?? throw new InvalidOperationException("Could not connect to server");
+
+    FactorioRconClient? GetConnectedClient()
     {
         // fast exit
         if (_cachedClient is { Connected: true })
         {
             return _cachedClient;
+        }
+
+        TimeSpan timeSinceLastConnectionAttempt = _lastConnectionAttemptDate - DateTime.Now;
+        TimeSpan timeUntilNextConnectionAttempt = timeSinceLastConnectionAttempt - MinReconnectionDelay;
+        if (timeUntilNextConnectionAttempt > TimeSpan.Zero)
+        {
+            return null;
         }
 
         lock (_clientConnectionLock)
@@ -62,12 +84,27 @@ class FactorioClient
             _cachedClient?.Dispose();
             _cachedClient = new FactorioRconClient(_host, _port);
 
-            if (!_cachedClient.ConnectAsync(_password).RunSync())
+            _lastConnectionAttemptDate = DateTime.Now;
+
+            bool connected = false;
+
+            try
             {
-                throw new InvalidOperationException("Could not connect to server");
+                connected = _cachedClient.ConnectAsync(_password).RunSync();
+            }
+            catch (Exception exn)
+            {
+                _logger?.LogError(exn, "An error occurred while trying to connect to {host}:{port}.", _host, _port);
             }
 
-            return _cachedClient;
+            if (connected)
+            {
+                return _cachedClient;
+            }
+
+            _cachedClient.Dispose();
+            _cachedClient = null;
+            return null;
         }
     }
 }

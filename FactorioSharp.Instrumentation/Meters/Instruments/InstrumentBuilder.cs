@@ -5,11 +5,11 @@ namespace FactorioSharp.Instrumentation.Meters.Instruments;
 
 class InstrumentBuilder<T> where T: struct
 {
-    readonly Func<T> _observe;
+    protected Func<T>? Observe { get; set; }
 
-    protected InstrumentBuilder(InstrumentType type, string name, Func<T> observe, string? unit = null, string? description = null)
+    protected InstrumentBuilder(InstrumentType type, string name, Func<T>? observe = null, string? unit = null, string? description = null)
     {
-        _observe = observe;
+        Observe = observe;
         Type = type;
         Name = name;
         Unit = unit;
@@ -55,7 +55,12 @@ class InstrumentBuilder<T> where T: struct
     {
         try
         {
-            return _observe();
+            if (Observe == null)
+            {
+                throw new ArgumentNullException(nameof(Observe), "Observation method not defined");
+            }
+
+            return Observe();
         }
         catch (Exception exn)
         {
