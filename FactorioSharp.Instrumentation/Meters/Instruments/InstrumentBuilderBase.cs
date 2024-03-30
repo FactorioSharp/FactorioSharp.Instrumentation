@@ -16,11 +16,6 @@ abstract class InstrumentBuilderBase<T> where T: struct
     public string Name { get; }
     public string? Unit { get; }
     public string? Description { get; }
-    public bool Enabled { get; private set; } = true;
-
-    public void Enable() => Enabled = true;
-
-    public void Disable() => Enabled = false;
 
     public abstract T Observe();
 
