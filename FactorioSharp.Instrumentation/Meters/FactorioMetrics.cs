@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.Metrics;
 using System.Reflection;
-using FactorioRconSharp;
 using FactorioSharp.Instrumentation.Extensions;
+using FactorioSharp.Rcon;
 using Microsoft.Extensions.Logging;
 
 namespace FactorioSharp.Instrumentation.Meters;
