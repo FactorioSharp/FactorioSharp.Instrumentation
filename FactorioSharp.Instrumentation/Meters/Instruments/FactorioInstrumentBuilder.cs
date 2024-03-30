@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 using FactorioSharp.Instrumentation.Extensions;
-using FactorioSharp.Rcon;
+using FactorioSharp.Instrumentation.Integration;
 using FactorioSharp.Rcon.Model;
 
 namespace FactorioSharp.Instrumentation.Meters.Instruments;
@@ -8,7 +8,7 @@ namespace FactorioSharp.Instrumentation.Meters.Instruments;
 class FactorioInstrumentBuilder<T> : InstrumentBuilder<T> where T: struct
 {
     public FactorioInstrumentBuilder(
-        FactorioRconClient client,
+        FactorioClient client,
         InstrumentType type,
         string name,
         Expression<Func<FactorioRconGlobals, T>> observe,
@@ -18,5 +18,5 @@ class FactorioInstrumentBuilder<T> : InstrumentBuilder<T> where T: struct
     {
     }
 
-    static T Observe(FactorioRconClient client, Expression<Func<FactorioRconGlobals, T>> observe) => client.ReadAsync(observe).RunSync();
+    static T Observe(FactorioClient client, Expression<Func<FactorioRconGlobals, T>> observe) => client.ReadAsync(observe).RunSync();
 }
