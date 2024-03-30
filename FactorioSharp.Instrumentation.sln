@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FactorioSharp.Instrumentation", "FactorioSharp.Instrumentation\FactorioSharp.Instrumentation.csproj", "{66B1DC4E-D45D-4D28-8192-AB5F00324F6B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FactorioSharp.Instrumentation.Console", "FactorioSharp.Instrumentation.Console\FactorioSharp.Instrumentation.Console.csproj", "{813E3DE5-E823-4A60-B65B-02B3E2872A15}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApplication", "TestApplication\TestApplication.csproj", "{813E3DE5-E823-4A60-B65B-02B3E2872A15}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
