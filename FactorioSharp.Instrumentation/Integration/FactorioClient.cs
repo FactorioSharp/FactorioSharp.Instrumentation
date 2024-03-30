@@ -16,11 +16,6 @@ namespace FactorioSharp.Instrumentation.Integration;
 /// </remarks>
 class FactorioClient
 {
-    /// <summary>
-    ///     For some reason, when the initial connection to the server fails, the same client cannot be reused to perform new connection attempts.
-    ///     Instead the client is rebuilt each time the connection fails or is aborted.
-    ///     This seems to be due to the underlying RconSharp library.
-    /// </summary>
     FactorioRconClient? _cachedClient;
     readonly string _host;
     readonly int _port;
@@ -59,6 +54,10 @@ class FactorioClient
             {
                 return _cachedClient;
             }
+
+            // For some reason, when the initial connection to the server fails, the same client cannot be reused to perform new connection attempts.
+            // Instead the client is rebuilt each time the connection fails or is aborted.
+            // This seems to be due to the underlying RconSharp library.
 
             _cachedClient?.Dispose();
             _cachedClient = new FactorioRconClient(_host, _port);
