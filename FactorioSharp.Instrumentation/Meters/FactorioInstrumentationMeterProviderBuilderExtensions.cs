@@ -1,6 +1,5 @@
 ﻿using FactorioSharp.Instrumentation.Extensions;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using OpenTelemetry.Metrics;
 
 namespace FactorioSharp.Instrumentation.Meters;
@@ -28,7 +27,7 @@ public static class FactorioInstrumentationMeterProviderBuilderExtensions
         FactorioMetersOptions options = new();
         configureExporterOptions?.Invoke(options);
 
-        FactorioMetrics instrumentation = new(ipAddress, port, password, options, loggerFactory?.CreateLogger<FactorioMetrics>() ?? NullLogger<FactorioMetrics>.Instance);
+        FactorioMetrics instrumentation = new(ipAddress, port, password, options, loggerFactory);
         instrumentation.Initialize().RunSync();
 
         builder.AddMeter(instrumentation.MeterInstance.Name);

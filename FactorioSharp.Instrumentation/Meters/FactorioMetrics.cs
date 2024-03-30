@@ -12,14 +12,14 @@ public class FactorioMetrics : IDisposable
 
     readonly string _password;
     readonly FactorioMetersOptions _options;
-    readonly ILogger<FactorioMetrics> _logger;
+    readonly ILoggerFactory? _loggerFactory;
     readonly FactorioRconClient _factorioClient;
 
-    public FactorioMetrics(string url, int port, string password, FactorioMetersOptions options, ILogger<FactorioMetrics> logger)
+    public FactorioMetrics(string url, int port, string password, FactorioMetersOptions options, ILoggerFactory? loggerFactory = null)
     {
         _password = password;
         _options = options;
-        _logger = logger;
+        _loggerFactory = loggerFactory;
         _factorioClient = new FactorioRconClient(url, port);
 
         AssemblyName assemblyName = typeof(FactorioMetrics).Assembly.GetName();
@@ -33,6 +33,12 @@ public class FactorioMetrics : IDisposable
             throw new InvalidOperationException("Could not connect to factorio server");
         }
 
+        new FactorioInstrumentBuilder<int>(_factorioClient, InstrumentType.Gauge, "factorio.server.status", g => 1, description: "Is the server running: 1 (true) or 0 (false)")
+        {
+            Log = _loggerFactory?.CreateLogger("factorio.server.status"),
+            OnException = BehaviorOnException.ReturnDefault
+        }.Build(MeterInstance);
+
         new FactorioInstrumentBuilder<int>(
             _factorioClient,
             InstrumentType.UpDownCounter,
@@ -40,7 +46,10 @@ public class FactorioMetrics : IDisposable
             g => (int)g.Game.Players.Length,
             "{player}",
             "Total number of players on the map"
-        ).Build(MeterInstance);
+        )
+        {
+            Log = _loggerFactory?.CreateLogger("factorio.server.player.count")
+        }.Build(MeterInstance);
     }
 
     public void Dispose()
