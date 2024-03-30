@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.Metrics;
 using System.Reflection;
-using FactorioSharp.Instrumentation.Extensions;
+using FactorioSharp.Instrumentation.Meters.Instruments;
 using FactorioSharp.Rcon;
 using Microsoft.Extensions.Logging;
 
@@ -34,10 +34,7 @@ public class FactorioMetrics : IDisposable
         }
 
         CreateObservableUpDownCounter(
-            "factorio.server.player.count",
-            async () => (int)await _factorioClient.ReadAsync(g => g.Game.Players.Length),
-            "{player}",
-            "Number of connected players"
+            new FactorioInstrument<int>(_factorioClient, "factorio.server.player.count", g => (int)g.Game.Players.Length, "{player}", "Number of connected players")
         );
     }
 
@@ -47,24 +44,22 @@ public class FactorioMetrics : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    void CreateObservableUpDownCounter<T>(string name, Func<Task<T>> observeValue, string? unit = null, string? description = null) where T: struct =>
+    void CreateObservableUpDownCounter<T>(InstrumentBase<T> instrument) where T: struct =>
         MeterInstance.CreateObservableUpDownCounter(
-            name,
+            instrument.Name,
             () =>
             {
                 try
                 {
-                    Task<T> resultTask = observeValue();
-                    T result = resultTask.RunSync();
-                    return result;
+                    return instrument.Observe();
                 }
                 catch (Exception exn)
                 {
-                    _logger.LogError("An error occured while observing metric {name}: {exn}.\n{exnDetailed}", name, exn.Message, exn);
+                    _logger.LogError("An error occured while observing instrument {name}: {exn}.\n{exnDetailed}", instrument.Name, exn.Message, exn);
                     throw;
                 }
             },
-            unit,
-            description
+            instrument.Unit,
+            instrument.Description
         );
 }

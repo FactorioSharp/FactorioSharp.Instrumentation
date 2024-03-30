@@ -26,7 +26,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="FactorioSharp.Rcon" Version="0.3.0" />
+      <PackageReference Include="FactorioSharp.Rcon" Version="0.3.2" />
       <PackageReference Include="OpenTelemetry" Version="1.7.0" />
       <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="8.0.0" />
     </ItemGroup>
