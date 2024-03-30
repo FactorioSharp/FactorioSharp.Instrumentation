@@ -33,9 +33,14 @@ public class FactorioMetrics : IDisposable
             throw new InvalidOperationException("Could not connect to factorio server");
         }
 
-        CreateObservableUpDownCounter(
-            new FactorioInstrument<int>(_factorioClient, "factorio.server.player.count", g => (int)g.Game.Players.Length, "{player}", "Number of connected players")
-        );
+        new FactorioInstrumentBuilder<int>(
+            _factorioClient,
+            InstrumentType.UpDownCounter,
+            "factorio.server.player.count",
+            g => (int)g.Game.Players.Length,
+            "{player}",
+            "Total number of players on the map"
+        ).Build(MeterInstance);
     }
 
     public void Dispose()
@@ -43,23 +48,4 @@ public class FactorioMetrics : IDisposable
         _factorioClient.Disconnect();
         GC.SuppressFinalize(this);
     }
-
-    void CreateObservableUpDownCounter<T>(InstrumentBase<T> instrument) where T: struct =>
-        MeterInstance.CreateObservableUpDownCounter(
-            instrument.Name,
-            () =>
-            {
-                try
-                {
-                    return instrument.Observe();
-                }
-                catch (Exception exn)
-                {
-                    _logger.LogError("An error occured while observing instrument {name}: {exn}.\n{exnDetailed}", instrument.Name, exn.Message, exn);
-                    throw;
-                }
-            },
-            instrument.Unit,
-            instrument.Description
-        );
 }
