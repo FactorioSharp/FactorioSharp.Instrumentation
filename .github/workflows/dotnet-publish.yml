@@ -1,0 +1,35 @@
+name: .NET - Build and Publish 
+
+on:
+  push:
+    paths-ignore:
+    - 'changelog.md'
+    - 'readme.md'
+  workflow_dispatch:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Install .NET 8.0
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Install dotnet-releaser
+      shell: bash
+      run: dotnet tool install --global dotnet-releaser
+
+    - name: Build, Tests, Cover, Pack and Publish
+      shell: bash
+      run: dotnet-releaser run --nuget-token "${{secrets.NUGET_TOKEN}}" --github-token "${{secrets.GITHUB_TOKEN}}" dotnet-releaser.toml
+      
+permissions:
+  contents: write

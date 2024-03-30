@@ -1,0 +1,9 @@
+profile = "default"
+
+[msbuild]
+project = ["./FactorioSharp.Instrumentation/FactorioSharp.Instrumentation.csproj"]
+
+[github]
+user = "FactorioSharp"
+repo = "FactorioSharp.Instrumentation"
+version_prefix = "v"

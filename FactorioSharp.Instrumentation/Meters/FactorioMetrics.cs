@@ -17,9 +17,6 @@ public class FactorioMetrics : IDisposable
 
     public FactorioMetrics(string url, int port, string password, FactorioMetersOptions options, ILogger<FactorioMetrics> logger)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(url);
-        ArgumentException.ThrowIfNullOrWhiteSpace(password);
-
         _password = password;
         _options = options;
         _logger = logger;

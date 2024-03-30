@@ -25,8 +25,6 @@ public static class FactorioInstrumentationMeterProviderBuilderExtensions
         ILoggerFactory? loggerFactory = null
     )
     {
-        ArgumentNullException.ThrowIfNull(builder);
-
         FactorioMetersOptions options = new();
         configureExporterOptions?.Invoke(options);
 
