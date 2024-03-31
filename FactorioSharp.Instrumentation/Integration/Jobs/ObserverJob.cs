@@ -1,11 +1,21 @@
 ﻿using FactorioSharp.Instrumentation.Integration.Model;
+using FactorioSharp.Rcon;
 
 namespace FactorioSharp.Instrumentation.Integration.Jobs;
 
 /// <summary>
-///     Observe data from the factorio server
+///     Read data from the factorio server and update the cache
 /// </summary>
-abstract class ObserverJob
+abstract class ObserverJob : IJob
 {
-    public abstract Task ExecuteAsync(FactorioClient client, FactorioServerData data);
+    protected FactorioRconClient Client { get; }
+    protected FactorioServerData Data { get; }
+
+    protected ObserverJob(FactorioRconClient client, FactorioServerData data)
+    {
+        Client = client;
+        Data = data;
+    }
+
+    public abstract Task ExecuteAsync();
 }
