@@ -55,7 +55,7 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
             if (client.Succeeded)
             {
                 _cache.Status = true;
-                await Work(client.Client!, stoppingToken);
+                await Tick(client.Client!, stoppingToken);
 
                 TimeSpan elapsed = DateTime.Now - startTime;
                 TimeSpan toWait = minDelayBetweenObservations - elapsed;
@@ -88,7 +88,7 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
         return base.StopAsync(cancellationToken);
     }
 
-    async Task Work(FactorioRconClient client, CancellationToken stoppingToken)
+    async Task Tick(FactorioRconClient client, CancellationToken stoppingToken)
     {
         foreach (string force in _options.Forces)
         {
