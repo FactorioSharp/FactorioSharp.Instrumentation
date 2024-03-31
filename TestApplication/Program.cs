@@ -8,7 +8,7 @@ using OpenTelemetry.Resources;
 const string serviceName = "Factorio";
 const string serviceVersion = "1.1.104";
 
-ILoggerFactory loggerFactory = LoggerFactory.Create(builder => builder.AddSimpleConsole());
+ILoggerFactory loggerFactory = LoggerFactory.Create(builder => builder.SetMinimumLevel(LogLevel.Debug).AddSimpleConsole());
 
 HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 

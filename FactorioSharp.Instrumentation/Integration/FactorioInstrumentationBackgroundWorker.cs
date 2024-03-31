@@ -119,17 +119,30 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
                 return GetConnectedClientResult.Success(_client);
             }
 
-            _client?.Dispose();
+            if (_client != null)
+            {
+                _logger.LogDebug("Connection to {host}:{port} has been lost, reconnection attempt...", _host, _port);
+                _client.Dispose();
+            }
+            else
+            {
+                _logger.LogDebug("Connection attempt to {host}:{port}...", _host, _port);
+            }
+
             _client = new FactorioRconClient(_host, _port);
+
 
             if (await _client.ConnectAsync(_password))
             {
+                _logger.LogDebug("Connected to {host}:{port}.", _host, _port);
                 return GetConnectedClientResult.Success(_client);
             }
 
+            _logger.LogDebug("Connection to {host}:{port} failed.", _host, _port);
+
             _client.Dispose();
             _client = null;
-            return GetConnectedClientResult.Failure("Authentication failed");
+            return GetConnectedClientResult.Failure($"Connection or authentication to {_host}:{_port} failed, double check the host, port and password.");
         }
         catch (Exception exn)
         {
