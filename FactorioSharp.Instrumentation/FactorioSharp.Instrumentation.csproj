@@ -5,7 +5,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <LangVersion>12</LangVersion>
-        <Version>0.2.1</Version>
+        <Version>0.2.2</Version>
         <Title>Factorio Instrumentation</Title>
         <Authors>Ismail Bennani</Authors>
         <Description>Factorio OpenTelemetry instrumentation for .NET Standard 2.1</Description>
