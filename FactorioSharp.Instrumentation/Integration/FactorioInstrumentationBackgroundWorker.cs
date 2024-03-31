@@ -3,6 +3,7 @@ using System.Reflection;
 using FactorioSharp.Instrumentation.Integration.Jobs;
 using FactorioSharp.Instrumentation.Integration.Model;
 using FactorioSharp.Instrumentation.Meters;
+using FactorioSharp.Instrumentation.Scheduling.Jobs;
 using FactorioSharp.Rcon;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -22,6 +23,7 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
     readonly ILogger<FactorioInstrumentationBackgroundWorker> _logger;
     FactorioRconClient? _client;
     readonly FactorioServerData _cache;
+    readonly List<Job> _jobs;
 
     public Meter Meter { get; }
 
@@ -40,39 +42,8 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
         Meter = new Meter(assemblyName.Name!, assemblyName.Version?.ToString());
 
         FactorioInstruments.Setup(Meter, _cache, options);
-    }
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-    {
-        TimeSpan minDelayBetweenObservations = TimeSpan.FromSeconds(1);
-        TimeSpan minDelayBetweenConnectionAttempts = TimeSpan.FromSeconds(30);
-
-        while (!stoppingToken.IsCancellationRequested)
-        {
-            DateTime startTime = DateTime.Now;
-
-            GetConnectedClientResult client = await TryGetConnectedClient();
-            if (client.Succeeded)
-            {
-                _cache.Status = true;
-                await Tick(client.Client!, stoppingToken);
-
-                TimeSpan elapsed = DateTime.Now - startTime;
-                TimeSpan toWait = minDelayBetweenObservations - elapsed;
-
-                if (toWait > TimeSpan.Zero)
-                {
-                    await Task.Delay(toWait, stoppingToken);
-                }
-            }
-            else
-            {
-                _cache.Status = false;
-                _logger.LogError(client.Exception, "Could not connect to server at {host}:{port}. Reason: {reason}.", _host, _port, client.FailureReason);
-
-                await Task.Delay(minDelayBetweenConnectionAttempts, stoppingToken);
-            }
-        }
+        _jobs = new List<Job> { new UpdateStatusJob(), new UpdateItemsJob(), new UpdateFluidsJob() };
     }
 
     public override Task StartAsync(CancellationToken cancellationToken)
@@ -88,25 +59,92 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
         return base.StopAsync(cancellationToken);
     }
 
-    async Task Tick(FactorioRconClient client, CancellationToken stoppingToken)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        foreach (string force in _options.Forces)
+        TimeSpan minDelayBetweenObservations = TimeSpan.FromSeconds(1);
+        TimeSpan minDelayBetweenConnectionAttempts = TimeSpan.FromSeconds(10);
+
+        await ExecuteOnStartAsync(stoppingToken);
+
+        bool isConnected = false;
+
+        while (!stoppingToken.IsCancellationRequested)
         {
-            if (stoppingToken.IsCancellationRequested)
+            DateTime startTime = DateTime.Now;
+
+            GetConnectedClientResult getClientResult = await TryGetConnectedClient();
+            if (getClientResult.Succeeded)
             {
-                return;
+                if (!isConnected)
+                {
+                    isConnected = true;
+                    await ExecuteOnConnectAsync(getClientResult.Client!, stoppingToken);
+                }
+
+                await ExecuteOnTickAsync(getClientResult.Client!, stoppingToken);
+
+                TimeSpan elapsed = DateTime.Now - startTime;
+                TimeSpan toWait = minDelayBetweenObservations - elapsed;
+
+                if (toWait > TimeSpan.Zero)
+                {
+                    await Task.Delay(toWait, stoppingToken);
+                }
             }
-
-            UpdateItemsJob itemsJob = new(client, _cache, force);
-            await itemsJob.ExecuteAsync();
-
-            if (stoppingToken.IsCancellationRequested)
+            else
             {
-                return;
-            }
+                if (isConnected)
+                {
+                    isConnected = false;
+                    await ExecuteOnDisconnectAsync(stoppingToken);
+                }
 
-            UpdateFluidsJob fluidsJob = new(client, _cache, force);
-            await fluidsJob.ExecuteAsync();
+                _logger.LogError(getClientResult.Exception, "Could not connect to server at {host}:{port}. Reason: {reason}.", _host, _port, getClientResult.FailureReason);
+
+                await Task.Delay(minDelayBetweenConnectionAttempts, stoppingToken);
+            }
+        }
+
+        await ExecuteOnStopAsync(stoppingToken);
+    }
+
+    async Task ExecuteOnStartAsync(CancellationToken stoppingToken)
+    {
+        foreach (Job job in _jobs)
+        {
+            await job.OnStartAsync(_cache, stoppingToken);
+        }
+    }
+
+    async Task ExecuteOnConnectAsync(FactorioRconClient client, CancellationToken stoppingToken)
+    {
+        foreach (Job job in _jobs)
+        {
+            await job.OnConnectAsync(client, _cache, stoppingToken);
+        }
+    }
+
+    async Task ExecuteOnTickAsync(FactorioRconClient client, CancellationToken stoppingToken)
+    {
+        foreach (Job job in _jobs)
+        {
+            await job.OnTickAsync(client, _cache, stoppingToken);
+        }
+    }
+
+    async Task ExecuteOnDisconnectAsync(CancellationToken stoppingToken)
+    {
+        foreach (Job job in _jobs)
+        {
+            await job.OnDisconnectAsync(_cache, stoppingToken);
+        }
+    }
+
+    async Task ExecuteOnStopAsync(CancellationToken stoppingToken)
+    {
+        foreach (Job job in _jobs)
+        {
+            await job.OnStopAsync(_cache, stoppingToken);
         }
     }
 

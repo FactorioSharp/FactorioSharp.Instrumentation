@@ -11,20 +11,3 @@ class FactorioServerData
 
     public Dictionary<string, FactorioForceData> Forces { get; } = new();
 }
-
-class FactorioForceData
-{
-    public FactorioProductionData Production { get; } = new();
-}
-
-class FactorioProductionData
-{
-    public FactorioFlowData<ulong> Item { get; } = new();
-    public FactorioFlowData<double> Fluid { get; } = new();
-}
-
-class FactorioFlowData<TValue>
-{
-    public Dictionary<string, TValue> Inputs { get; } = new();
-    public Dictionary<string, TValue> Outputs { get; } = new();
-}
