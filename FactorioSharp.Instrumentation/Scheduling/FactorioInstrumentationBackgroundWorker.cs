@@ -24,7 +24,7 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
     readonly ILogger<FactorioInstrumentationBackgroundWorker> _logger;
     FactorioRconClient? _client;
     readonly FactorioServerData _cache;
-    readonly List<Job> _jobs;
+    readonly JobCollection _jobs;
     Meter? _meter;
 
     public FactorioInstrumentationBackgroundWorker(string host, int port, string password, IOptions<FactorioMeterOptions> options, ILoggerFactory loggerFactory)
@@ -38,7 +38,7 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
         _cache = new FactorioServerData();
         _meter = CreateMeter();
 
-        _jobs = new List<Job>
+        _jobs = new JobCollection
         {
             new UpdateForcesToMeasureJob(loggerFactory.CreateLogger<UpdateForcesToMeasureJob>()),
             new UpdateItemsToMeasureJob(loggerFactory.CreateLogger<UpdateItemsToMeasureJob>()),
@@ -67,7 +67,7 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
         TimeSpan minDelayBetweenObservations = TimeSpan.FromSeconds(1);
         TimeSpan minDelayBetweenConnectionAttempts = TimeSpan.FromSeconds(10);
 
-        await ExecuteOnStartAsync(_options, stoppingToken);
+        await _jobs.ExecuteOnStartAsync(_cache, _options, stoppingToken);
 
         bool isConnected = false;
 
@@ -81,13 +81,13 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
                 if (!isConnected)
                 {
                     isConnected = true;
-                    await ExecuteOnConnectAsync(getClientResult.Client!, _options, stoppingToken);
+                    await _jobs.ExecuteOnConnectAsync(_cache, getClientResult.Client!, _options, stoppingToken);
 
                     _meter ??= CreateMeter();
                     FactorioInstruments.Setup(_meter, _cache, _options);
                 }
 
-                await ExecuteOnTickAsync(getClientResult.Client!, _options, stoppingToken);
+                await _jobs.ExecuteOnTickAsync(_cache, getClientResult.Client!, _options, stoppingToken);
 
                 TimeSpan elapsed = DateTime.Now - startTime;
                 TimeSpan toWait = minDelayBetweenObservations - elapsed;
@@ -102,7 +102,7 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
                 if (isConnected)
                 {
                     isConnected = false;
-                    await ExecuteOnDisconnectAsync(_options, stoppingToken);
+                    await _jobs.ExecuteOnDisconnectAsync(_cache, _options, stoppingToken);
 
                     _meter?.Dispose();
                     _meter = CreateMeter();
@@ -114,47 +114,7 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
             }
         }
 
-        await ExecuteOnStopAsync(_options, stoppingToken);
-    }
-
-    async Task ExecuteOnStartAsync(FactorioMeterOptionsInternal options, CancellationToken stoppingToken)
-    {
-        foreach (Job job in _jobs)
-        {
-            await job.OnStartAsync(_cache, options, stoppingToken);
-        }
-    }
-
-    async Task ExecuteOnConnectAsync(FactorioRconClient client, FactorioMeterOptionsInternal options, CancellationToken stoppingToken)
-    {
-        foreach (Job job in _jobs)
-        {
-            await job.OnConnectAsync(client, _cache, options, stoppingToken);
-        }
-    }
-
-    async Task ExecuteOnTickAsync(FactorioRconClient client, FactorioMeterOptionsInternal options, CancellationToken stoppingToken)
-    {
-        foreach (Job job in _jobs)
-        {
-            await job.OnTickAsync(client, _cache, options, stoppingToken);
-        }
-    }
-
-    async Task ExecuteOnDisconnectAsync(FactorioMeterOptionsInternal options, CancellationToken stoppingToken)
-    {
-        foreach (Job job in _jobs)
-        {
-            await job.OnDisconnectAsync(_cache, options, stoppingToken);
-        }
-    }
-
-    async Task ExecuteOnStopAsync(FactorioMeterOptionsInternal options, CancellationToken stoppingToken)
-    {
-        foreach (Job job in _jobs)
-        {
-            await job.OnStopAsync(_cache, options, stoppingToken);
-        }
+        await _jobs.ExecuteOnStopAsync(_cache, _options, stoppingToken);
     }
 
     Meter CreateMeter()
