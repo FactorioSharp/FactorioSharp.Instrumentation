@@ -15,7 +15,7 @@ HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddOpenTelemetry()
     .WithMetrics(
         metrics => metrics.ConfigureResource(resource => resource.AddService(serviceName, serviceVersion))
-            .AddFactorioInstrumentation("127.0.0.1", "password", loggerFactory: loggerFactory)
+            .AddFactorioInstrumentation("127.0.0.1", 27015, "password")
             .AddConsoleExporter((_, options) => options.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 1000)
     );
 

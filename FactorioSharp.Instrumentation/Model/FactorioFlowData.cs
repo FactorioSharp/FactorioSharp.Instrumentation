@@ -1,4 +1,4 @@
-namespace FactorioSharp.Instrumentation.Integration.Model;
+namespace FactorioSharp.Instrumentation.Model;
 
 class FactorioFlowData<TValue>
 {

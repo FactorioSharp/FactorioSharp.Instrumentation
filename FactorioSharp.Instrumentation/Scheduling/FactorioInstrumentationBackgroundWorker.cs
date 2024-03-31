@@ -1,49 +1,53 @@
 ﻿using System.Diagnostics.Metrics;
-using System.Reflection;
 using FactorioSharp.Instrumentation.Integration.Jobs;
-using FactorioSharp.Instrumentation.Integration.Model;
 using FactorioSharp.Instrumentation.Meters;
-using FactorioSharp.Instrumentation.Scheduling.Jobs;
+using FactorioSharp.Instrumentation.Model;
 using FactorioSharp.Rcon;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
-namespace FactorioSharp.Instrumentation.Integration;
+namespace FactorioSharp.Instrumentation.Scheduling;
 
 /// <summary>
 ///     Collect data from the factorio server periodically and emit it on the available meters
 /// </summary>
 class FactorioInstrumentationBackgroundWorker : BackgroundService
 {
+    public static readonly string MeterName = typeof(FactorioInstruments).Assembly.GetName().Name!;
+    public static readonly string MeterVersion = typeof(FactorioInstruments).Assembly.GetName().Version!.ToString();
+
     readonly string _host;
     readonly int _port;
     readonly string _password;
-    readonly FactorioInstrumentationOptions _options;
+    readonly FactorioMeterOptionsInternal _options;
     readonly ILoggerFactory _loggerFactory;
     readonly ILogger<FactorioInstrumentationBackgroundWorker> _logger;
     FactorioRconClient? _client;
     readonly FactorioServerData _cache;
     readonly List<Job> _jobs;
+    Meter? _meter;
 
-    public Meter Meter { get; }
-
-    public FactorioInstrumentationBackgroundWorker(string host, int port, string password, FactorioInstrumentationOptions options, ILoggerFactory loggerFactory)
+    public FactorioInstrumentationBackgroundWorker(string host, int port, string password, IOptions<FactorioMeterOptions> options, ILoggerFactory loggerFactory)
     {
         _host = host;
         _port = port;
         _password = password;
-        _options = options;
+        _options = new FactorioMeterOptionsInternal(options.Value);
         _loggerFactory = loggerFactory;
         _logger = loggerFactory.CreateLogger<FactorioInstrumentationBackgroundWorker>();
 
         _cache = new FactorioServerData();
+        _meter = CreateMeter();
 
-        AssemblyName assemblyName = typeof(FactorioInstruments).Assembly.GetName();
-        Meter = new Meter(assemblyName.Name!, assemblyName.Version?.ToString());
-
-        FactorioInstruments.Setup(Meter, _cache, options);
-
-        _jobs = new List<Job> { new UpdateStatusJob(), new UpdateItemsJob(), new UpdateFluidsJob() };
+        _jobs = new List<Job>
+        {
+            new UpdateForcesToMeasureJob(_loggerFactory.CreateLogger<UpdateForcesToMeasureJob>()),
+            new UpdateItemsToMeasureJob(_loggerFactory.CreateLogger<UpdateItemsToMeasureJob>()),
+            new UpdateFluidsToMeasureJob(_loggerFactory.CreateLogger<UpdateFluidsToMeasureJob>()),
+            new UpdateItemsJob(),
+            new UpdateFluidsJob()
+        };
     }
 
     public override Task StartAsync(CancellationToken cancellationToken)
@@ -56,6 +60,7 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
     {
         _logger.LogInformation("Stopping background worker...");
         _client?.Dispose();
+        _meter?.Dispose();
         return base.StopAsync(cancellationToken);
     }
 
@@ -64,7 +69,7 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
         TimeSpan minDelayBetweenObservations = TimeSpan.FromSeconds(1);
         TimeSpan minDelayBetweenConnectionAttempts = TimeSpan.FromSeconds(10);
 
-        await ExecuteOnStartAsync(stoppingToken);
+        await ExecuteOnStartAsync(_options, stoppingToken);
 
         bool isConnected = false;
 
@@ -78,10 +83,13 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
                 if (!isConnected)
                 {
                     isConnected = true;
-                    await ExecuteOnConnectAsync(getClientResult.Client!, stoppingToken);
+                    await ExecuteOnConnectAsync(getClientResult.Client!, _options, stoppingToken);
+
+                    _meter ??= CreateMeter();
+                    FactorioInstruments.Setup(_meter, _cache, _options);
                 }
 
-                await ExecuteOnTickAsync(getClientResult.Client!, stoppingToken);
+                await ExecuteOnTickAsync(getClientResult.Client!, _options, stoppingToken);
 
                 TimeSpan elapsed = DateTime.Now - startTime;
                 TimeSpan toWait = minDelayBetweenObservations - elapsed;
@@ -96,7 +104,10 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
                 if (isConnected)
                 {
                     isConnected = false;
-                    await ExecuteOnDisconnectAsync(stoppingToken);
+                    await ExecuteOnDisconnectAsync(_options, stoppingToken);
+
+                    _meter?.Dispose();
+                    _meter = CreateMeter();
                 }
 
                 _logger.LogError(getClientResult.Exception, "Could not connect to server at {host}:{port}. Reason: {reason}.", _host, _port, getClientResult.FailureReason);
@@ -105,47 +116,55 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
             }
         }
 
-        await ExecuteOnStopAsync(stoppingToken);
+        await ExecuteOnStopAsync(_options, stoppingToken);
     }
 
-    async Task ExecuteOnStartAsync(CancellationToken stoppingToken)
+    async Task ExecuteOnStartAsync(FactorioMeterOptionsInternal options, CancellationToken stoppingToken)
     {
         foreach (Job job in _jobs)
         {
-            await job.OnStartAsync(_cache, stoppingToken);
+            await job.OnStartAsync(_cache, options, stoppingToken);
         }
     }
 
-    async Task ExecuteOnConnectAsync(FactorioRconClient client, CancellationToken stoppingToken)
+    async Task ExecuteOnConnectAsync(FactorioRconClient client, FactorioMeterOptionsInternal options, CancellationToken stoppingToken)
     {
         foreach (Job job in _jobs)
         {
-            await job.OnConnectAsync(client, _cache, stoppingToken);
+            await job.OnConnectAsync(client, _cache, options, stoppingToken);
         }
     }
 
-    async Task ExecuteOnTickAsync(FactorioRconClient client, CancellationToken stoppingToken)
+    async Task ExecuteOnTickAsync(FactorioRconClient client, FactorioMeterOptionsInternal options, CancellationToken stoppingToken)
     {
         foreach (Job job in _jobs)
         {
-            await job.OnTickAsync(client, _cache, stoppingToken);
+            await job.OnTickAsync(client, _cache, options, stoppingToken);
         }
     }
 
-    async Task ExecuteOnDisconnectAsync(CancellationToken stoppingToken)
+    async Task ExecuteOnDisconnectAsync(FactorioMeterOptionsInternal options, CancellationToken stoppingToken)
     {
         foreach (Job job in _jobs)
         {
-            await job.OnDisconnectAsync(_cache, stoppingToken);
+            await job.OnDisconnectAsync(_cache, options, stoppingToken);
         }
     }
 
-    async Task ExecuteOnStopAsync(CancellationToken stoppingToken)
+    async Task ExecuteOnStopAsync(FactorioMeterOptionsInternal options, CancellationToken stoppingToken)
     {
         foreach (Job job in _jobs)
         {
-            await job.OnStopAsync(_cache, stoppingToken);
+            await job.OnStopAsync(_cache, options, stoppingToken);
         }
+    }
+
+    Meter CreateMeter()
+    {
+        Meter meter = new(MeterName, MeterVersion);
+        meter.CreateObservableGauge("factorio.server.status", () => _client is { Connected: true } ? 1 : 0, "1", "The current status of the factorio server");
+
+        return meter;
     }
 
     async Task<GetConnectedClientResult> TryGetConnectedClient()
