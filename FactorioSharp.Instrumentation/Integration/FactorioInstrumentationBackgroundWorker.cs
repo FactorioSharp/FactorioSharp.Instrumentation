@@ -44,7 +44,8 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        TimeSpan minDelay = TimeSpan.FromSeconds(1);
+        TimeSpan minDelayBetweenObservations = TimeSpan.FromSeconds(1);
+        TimeSpan minDelayBetweenConnectionAttempts = TimeSpan.FromSeconds(30);
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -57,7 +58,7 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
                 await Work(client.Client!, stoppingToken);
 
                 TimeSpan elapsed = DateTime.Now - startTime;
-                TimeSpan toWait = minDelay - elapsed;
+                TimeSpan toWait = minDelayBetweenObservations - elapsed;
 
                 if (toWait > TimeSpan.Zero)
                 {
@@ -68,6 +69,8 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
             {
                 _cache.Status = false;
                 _logger.LogError(client.Exception, "Could not connect to server at {host}:{port}. Reason: {reason}.", _host, _port, client.FailureReason);
+
+                await Task.Delay(minDelayBetweenConnectionAttempts, stoppingToken);
             }
         }
     }
