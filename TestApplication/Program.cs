@@ -1,22 +1,22 @@
 ﻿using FactorioSharp.Instrumentation.Meters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 
 const string serviceName = "Factorio";
 const string serviceVersion = "1.1.104";
 
-ILoggerFactory loggerFactory = LoggerFactory.Create(builder => builder.SetMinimumLevel(LogLevel.Debug).AddSimpleConsole());
-
 HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 
 builder.Services.AddOpenTelemetry()
     .WithMetrics(
-        metrics => metrics.ConfigureResource(resource => resource.AddService(serviceName, serviceVersion))
-            .AddFactorioInstrumentation("127.0.0.1", 27015, "password")
-            .AddConsoleExporter((_, options) => options.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 1000)
+        metricsBuilder =>
+        {
+            metricsBuilder.ConfigureResource(resource => resource.AddService(serviceName, serviceVersion))
+                .AddFactorioInstrumentation("127.0.0.1", 27015, "password")
+                .AddPrometheusHttpListener(options => options.UriPrefixes = ["http://localhost:9184/"]);
+        }
     );
 
 IHost app = builder.Build();

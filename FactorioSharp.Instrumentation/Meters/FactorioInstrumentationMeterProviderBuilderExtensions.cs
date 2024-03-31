@@ -13,18 +13,16 @@ public static class FactorioInstrumentationMeterProviderBuilderExtensions
         this MeterProviderBuilder builder,
         string host,
         string password,
-        Action<FactorioMeterOptions>? configureExporterOptions = null,
-        ILoggerFactory? loggerFactory = null
+        Action<FactorioMeterOptions>? configureExporterOptions = null
     ) =>
-        AddFactorioInstrumentation(builder, host, 27015, password, configureExporterOptions, loggerFactory);
+        AddFactorioInstrumentation(builder, host, 27015, password, configureExporterOptions);
 
     public static MeterProviderBuilder AddFactorioInstrumentation(
         this MeterProviderBuilder builder,
         string host,
         int port,
         string password,
-        Action<FactorioMeterOptions>? configureOptions = null,
-        ILoggerFactory? loggerFactory = null
+        Action<FactorioMeterOptions>? configureOptions = null
     )
     {
         if (configureOptions != null)
