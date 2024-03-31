@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.Metrics;
 using System.Reflection;
-using FactorioSharp.Instrumentation.Meters.Instruments;
+using FactorioSharp.Instrumentation.Integration.Model;
+using FactorioSharp.Instrumentation.Meters;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -14,9 +15,9 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
     readonly FactorioInstrumentationOptions _options;
     readonly ILoggerFactory _loggerFactory;
     readonly FactorioClient _factorioClient;
+    readonly FactorioServerData _cache;
 
     public Meter Meter { get; }
-    public FactorioInstruments Instruments { get; }
 
     public FactorioInstrumentationBackgroundWorker(string host, int port, string password, FactorioInstrumentationOptions options, ILoggerFactory loggerFactory)
     {
@@ -24,10 +25,12 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
         _loggerFactory = loggerFactory;
         _factorioClient = new FactorioClient(host, port, password);
 
+        _cache = new FactorioServerData();
+
         AssemblyName assemblyName = typeof(FactorioInstruments).Assembly.GetName();
         Meter = new Meter(assemblyName.Name!, assemblyName.Version?.ToString());
 
-        Instruments = new FactorioInstruments(Meter);
+        FactorioInstruments.Setup(Meter, _cache, options);
     }
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken) => throw new NotImplementedException();
