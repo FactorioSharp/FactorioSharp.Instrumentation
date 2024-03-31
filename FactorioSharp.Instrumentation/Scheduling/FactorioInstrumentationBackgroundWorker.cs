@@ -21,7 +21,6 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
     readonly int _port;
     readonly string _password;
     readonly FactorioMeterOptionsInternal _options;
-    readonly ILoggerFactory _loggerFactory;
     readonly ILogger<FactorioInstrumentationBackgroundWorker> _logger;
     FactorioRconClient? _client;
     readonly FactorioServerData _cache;
@@ -34,7 +33,6 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
         _port = port;
         _password = password;
         _options = new FactorioMeterOptionsInternal(options.Value);
-        _loggerFactory = loggerFactory;
         _logger = loggerFactory.CreateLogger<FactorioInstrumentationBackgroundWorker>();
 
         _cache = new FactorioServerData();
@@ -42,9 +40,9 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
 
         _jobs = new List<Job>
         {
-            new UpdateForcesToMeasureJob(_loggerFactory.CreateLogger<UpdateForcesToMeasureJob>()),
-            new UpdateItemsToMeasureJob(_loggerFactory.CreateLogger<UpdateItemsToMeasureJob>()),
-            new UpdateFluidsToMeasureJob(_loggerFactory.CreateLogger<UpdateFluidsToMeasureJob>()),
+            new UpdateForcesToMeasureJob(loggerFactory.CreateLogger<UpdateForcesToMeasureJob>()),
+            new UpdateItemsToMeasureJob(loggerFactory.CreateLogger<UpdateItemsToMeasureJob>()),
+            new UpdateFluidsToMeasureJob(loggerFactory.CreateLogger<UpdateFluidsToMeasureJob>()),
             new UpdateItemsJob(),
             new UpdateFluidsJob()
         };
