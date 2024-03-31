@@ -1,5 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
-using OpenTelemetry.Metrics;
+﻿using FactorioSharp.Instrumentation.Scheduling;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using MeterProviderBuilder = OpenTelemetry.Metrics.MeterProviderBuilder;
+using OpenTelemetryDependencyInjectionMeterProviderBuilderExtensions = OpenTelemetry.Metrics.OpenTelemetryDependencyInjectionMeterProviderBuilderExtensions;
 
 namespace FactorioSharp.Instrumentation.Meters;
 
@@ -7,31 +11,45 @@ public static class FactorioInstrumentationMeterProviderBuilderExtensions
 {
     public static MeterProviderBuilder AddFactorioInstrumentation(
         this MeterProviderBuilder builder,
-        string ipAddress,
+        string host,
         string password,
-        Action<FactorioMetersOptions>? configureExporterOptions = null,
+        Action<FactorioMeterOptions>? configureExporterOptions = null,
         ILoggerFactory? loggerFactory = null
     ) =>
-        AddFactorioInstrumentation(builder, ipAddress, 27015, password, configureExporterOptions, loggerFactory);
+        AddFactorioInstrumentation(builder, host, 27015, password, configureExporterOptions, loggerFactory);
 
     public static MeterProviderBuilder AddFactorioInstrumentation(
         this MeterProviderBuilder builder,
-        string ipAddress,
+        string host,
         int port,
         string password,
-        Action<FactorioMetersOptions>? configureExporterOptions = null,
+        Action<FactorioMeterOptions>? configureOptions = null,
         ILoggerFactory? loggerFactory = null
     )
     {
-        FactorioMetersOptions options = new();
-        configureExporterOptions?.Invoke(options);
+        if (configureOptions != null)
+        {
+            OpenTelemetryDependencyInjectionMeterProviderBuilderExtensions.ConfigureServices(builder, services => services.Configure(configureOptions));
+        }
 
-        FactorioMetrics instrumentation = new(ipAddress, port, password, options, loggerFactory);
-        instrumentation.Initialize();
+        OpenTelemetryDependencyInjectionMeterProviderBuilderExtensions.ConfigureServices(
+            builder,
+            services =>
+            {
+                services.AddHostedService<FactorioInstrumentationBackgroundWorker>(
+                    s => new FactorioInstrumentationBackgroundWorker(
+                        host,
+                        port,
+                        password,
+                        s.GetRequiredService<IOptions<FactorioMeterOptions>>(),
+                        s.GetRequiredService<ILoggerFactory>()
+                    )
+                );
 
-        builder.AddMeter(instrumentation.MeterInstance.Name);
+                builder.AddMeter(FactorioInstrumentationBackgroundWorker.MeterName);
+            }
+        );
 
-        builder.AddInstrumentation(() => instrumentation);
 
         return builder;
     }
