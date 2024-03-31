@@ -48,8 +48,6 @@ class FactorioClient
 
     public async Task<T> ReadAsync<T>(Expression<Func<FactorioRconGlobals, T>> command) => await RequireConnectedClient().ReadAsync(command);
 
-    public async Task ExecuteAsync(Expression<Action<FactorioRconGlobals>> command) => await RequireConnectedClient().ExecuteAsync(command);
-
     public void Disconnect() => _cachedClient?.Disconnect();
 
     FactorioRconClient RequireConnectedClient() => GetConnectedClient() ?? throw new InvalidOperationException("Could not connect to server");

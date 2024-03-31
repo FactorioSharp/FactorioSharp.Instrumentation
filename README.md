@@ -1,6 +1,10 @@
 # FactorioSharp.Instrumentation
 
-Collect metrics and traces from a factorio server through an RCON connection.
+Collect data from a Factorio server through an RCON connection and define meters that read the data.
+The data can then be fed to any OpenTelemetry exporter.
+
+In order to keep the number of requests per second manageable, the collection of data from the server is rate-limited: in addition to specifying refresh rates on the different quantities that are measured, there is a master rate-limit that restricts the number of requests per second performed on the server.  
+The orchestration is performed by a background service that must be added to the host application.
 
 ## Quick start
 

@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using FactorioSharp.Instrumentation.Integration;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using OpenTelemetry.Metrics;
 
 namespace FactorioSharp.Instrumentation.Meters;
@@ -7,31 +9,29 @@ public static class FactorioInstrumentationMeterProviderBuilderExtensions
 {
     public static MeterProviderBuilder AddFactorioInstrumentation(
         this MeterProviderBuilder builder,
-        string ipAddress,
+        string host,
         string password,
-        Action<FactorioMetersOptions>? configureExporterOptions = null,
+        Action<FactorioInstrumentationOptions>? configureExporterOptions = null,
         ILoggerFactory? loggerFactory = null
     ) =>
-        AddFactorioInstrumentation(builder, ipAddress, 27015, password, configureExporterOptions, loggerFactory);
+        AddFactorioInstrumentation(builder, host, 27015, password, configureExporterOptions, loggerFactory);
 
     public static MeterProviderBuilder AddFactorioInstrumentation(
         this MeterProviderBuilder builder,
-        string ipAddress,
+        string host,
         int port,
         string password,
-        Action<FactorioMetersOptions>? configureExporterOptions = null,
+        Action<FactorioInstrumentationOptions>? configureOptions = null,
         ILoggerFactory? loggerFactory = null
     )
     {
-        FactorioMetersOptions options = new();
-        configureExporterOptions?.Invoke(options);
+        FactorioInstrumentationOptions options = new();
+        configureOptions?.Invoke(options);
 
-        FactorioMetrics instrumentation = new(ipAddress, port, password, options, loggerFactory);
-        instrumentation.Initialize();
+        FactorioInstrumentationBackgroundWorker worker = new(host, port, password, options, loggerFactory ?? NullLoggerFactory.Instance);
 
-        builder.AddMeter(instrumentation.MeterInstance.Name);
-
-        builder.AddInstrumentation(() => instrumentation);
+        builder.AddMeter(worker.Meter.Name);
+        builder.AddInstrumentation(worker.Meter);
 
         return builder;
     }
