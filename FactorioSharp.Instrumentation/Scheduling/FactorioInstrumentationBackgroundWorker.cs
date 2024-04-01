@@ -137,7 +137,7 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
             FactorioServerInstruments.Setup(_meter, _serverData, _options);
         }
 
-        _logger.LogError(result.Exception, "Could not connect to server at {host}:{port}. Reason: {reason}.", result.Host, result.Port, result.FailureReason);
+        _logger.LogError(result.Exception, "Could not connect to server at {host}:{port}. Reason: {reason}.", result.Uri.Host, result.Uri.Port, result.FailureReason);
     }
 
     Meter CreateMeter() => new(FactorioInstrumentationConstants.MeterName, FactorioInstrumentationConstants.MeterVersion);

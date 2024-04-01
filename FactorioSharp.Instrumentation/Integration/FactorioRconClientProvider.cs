@@ -66,17 +66,15 @@ public class FactorioRconClientProvider : IDisposable
 
     public class GetConnectedClientResult
     {
-        readonly Uri _uri;
         public bool Succeeded => Client != null;
-        public string Host { get; }
-        public int Port { get; }
+        public Uri Uri { get; }
         public FactorioRconClient? Client { get; }
         public string? FailureReason { get; }
         public Exception? Exception { get; }
 
         GetConnectedClientResult(Uri uri, FactorioRconClient? client, string? failureReason, Exception? exception)
         {
-            _uri = uri;
+            Uri = uri;
             Client = client;
             FailureReason = failureReason;
             Exception = exception;
