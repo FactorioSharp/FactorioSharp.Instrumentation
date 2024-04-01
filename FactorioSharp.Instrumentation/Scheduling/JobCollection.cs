@@ -23,7 +23,7 @@ class JobCollection : IEnumerable<Job>
 
     public void Add(Job item) => _jobs.Add(item);
 
-    public async Task ExecuteOnStartAsync(FactorioGameData data, FactorioMeterOptionsInternal options, CancellationToken stoppingToken)
+    public async Task ExecuteOnStartAsync(FactorioData data, FactorioMeterOptionsInternal options, CancellationToken stoppingToken)
     {
         foreach (Job job in _jobs)
         {
@@ -31,21 +31,15 @@ class JobCollection : IEnumerable<Job>
         }
     }
 
-    public async Task ExecuteOnConnectAsync(
-        FactorioServerData serverData,
-        FactorioGameData gameData,
-        FactorioRconClient client,
-        FactorioMeterOptionsInternal options,
-        CancellationToken stoppingToken
-    )
+    public async Task ExecuteOnConnectAsync(FactorioData data, FactorioRconClient client, FactorioMeterOptionsInternal options, CancellationToken stoppingToken)
     {
         foreach (Job job in _jobs)
         {
-            await HandleExceptions(() => job.OnConnectAsync(client, serverData, gameData, options, stoppingToken), job, "OnConnect");
+            await HandleExceptions(() => job.OnConnectAsync(client, data, options, stoppingToken), job, "OnConnect");
         }
     }
 
-    public async Task ExecuteOnTickAsync(FactorioGameData data, FactorioRconClient client, FactorioMeterOptionsInternal options, CancellationToken stoppingToken)
+    public async Task ExecuteOnTickAsync(FactorioData data, FactorioRconClient client, FactorioMeterOptionsInternal options, CancellationToken stoppingToken)
     {
         foreach (Job job in _jobs)
         {
@@ -53,15 +47,15 @@ class JobCollection : IEnumerable<Job>
         }
     }
 
-    public async Task ExecuteOnDisconnectAsync(FactorioServerData serverData, FactorioGameData gameData, FactorioMeterOptionsInternal options, CancellationToken stoppingToken)
+    public async Task ExecuteOnDisconnectAsync(FactorioData data, FactorioMeterOptionsInternal options, CancellationToken stoppingToken)
     {
         foreach (Job job in _jobs)
         {
-            await HandleExceptions(() => job.OnDisconnectAsync(serverData, gameData, options, stoppingToken), job, "OnDisconnect");
+            await HandleExceptions(() => job.OnDisconnectAsync(data, options, stoppingToken), job, "OnDisconnect");
         }
     }
 
-    public async Task ExecuteOnStopAsync(FactorioGameData data, FactorioMeterOptionsInternal options, CancellationToken stoppingToken)
+    public async Task ExecuteOnStopAsync(FactorioData data, FactorioMeterOptionsInternal options, CancellationToken stoppingToken)
     {
         foreach (Job job in _jobs)
         {

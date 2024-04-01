@@ -19,8 +19,7 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
     bool _isConnected;
     readonly FactorioMeterOptionsInternal _options;
     readonly ILogger<FactorioInstrumentationBackgroundWorker> _logger;
-    readonly FactorioServerData _serverData;
-    readonly FactorioGameData _gameData;
+    readonly FactorioData _data;
     readonly JobCollection _jobs;
     Meter? _meter;
 
@@ -36,16 +35,16 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
         _options = new FactorioMeterOptionsInternal(options.Value.Meter);
         _logger = loggerFactory.CreateLogger<FactorioInstrumentationBackgroundWorker>();
 
-        _serverData = new FactorioServerData(options.Value.Server.Uri, options.Value.Server.Name);
-        _gameData = new FactorioGameData();
+        _data = new FactorioData(options.Value.Server.Uri, options.Value.Server.Name);
 
         _meter = CreateMeter();
-        FactorioServerInstruments.Setup(_meter, _serverData, _options);
+        FactorioServerInstruments.Setup(_meter, _data.Server, _options);
 
         _jobs = new JobCollection(loggerFactory.CreateLogger<JobCollection>())
         {
             new UpdateFactorioServerStatus(loggerFactory.CreateLogger<UpdateFactorioServerStatus>()),
-            new UpdateFactorioServerData(loggerFactory.CreateLogger<UpdateFactorioServerData>()),
+            new UpdateFactorioServerMods(loggerFactory.CreateLogger<UpdateFactorioServerMods>()),
+            new UpdateFactorioServerPlayers(loggerFactory.CreateLogger<UpdateFactorioServerPlayers>()),
             new UpdateForcesToMeasureJob(loggerFactory.CreateLogger<UpdateForcesToMeasureJob>()),
             new UpdateItemsToMeasureJob(loggerFactory.CreateLogger<UpdateItemsToMeasureJob>()),
             new UpdateFluidsToMeasureJob(loggerFactory.CreateLogger<UpdateFluidsToMeasureJob>()),
@@ -73,7 +72,7 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
         TimeSpan minDelayBetweenObservations = TimeSpan.FromSeconds(1);
         TimeSpan minDelayBetweenConnectionAttempts = TimeSpan.FromSeconds(10);
 
-        await _jobs.ExecuteOnStartAsync(_gameData, _options, stoppingToken);
+        await _jobs.ExecuteOnStartAsync(_data, _options, stoppingToken);
 
         _isConnected = false;
 
@@ -101,7 +100,7 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
             }
         }
 
-        await _jobs.ExecuteOnStopAsync(_gameData, _options, stoppingToken);
+        await _jobs.ExecuteOnStopAsync(_data, _options, stoppingToken);
     }
 
     async Task HandleTick(FactorioRconClient client, CancellationToken stoppingToken)
@@ -110,18 +109,18 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
         {
             _isConnected = true;
 
-            await _jobs.ExecuteOnConnectAsync(_serverData, _gameData, client, _options, stoppingToken);
+            await _jobs.ExecuteOnConnectAsync(_data, client, _options, stoppingToken);
 
             if (_meter == null)
             {
                 _meter = CreateMeter();
-                FactorioServerInstruments.Setup(_meter, _serverData, _options);
+                FactorioServerInstruments.Setup(_meter, _data.Server, _options);
             }
 
-            FactorioGameInstruments.Setup(_meter, _serverData, _gameData, _options);
+            FactorioGameInstruments.Setup(_meter, _data, _options);
         }
 
-        await _jobs.ExecuteOnTickAsync(_gameData, client, _options, stoppingToken);
+        await _jobs.ExecuteOnTickAsync(_data, client, _options, stoppingToken);
     }
 
     async Task HandleConnectionFailed(FactorioRconClientProvider.GetConnectedClientResult result, CancellationToken stoppingToken)
@@ -130,11 +129,11 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
         {
             _isConnected = false;
 
-            await _jobs.ExecuteOnDisconnectAsync(_serverData, _gameData, _options, stoppingToken);
+            await _jobs.ExecuteOnDisconnectAsync(_data, _options, stoppingToken);
 
             _meter?.Dispose();
             _meter = CreateMeter();
-            FactorioServerInstruments.Setup(_meter, _serverData, _options);
+            FactorioServerInstruments.Setup(_meter, _data.Server, _options);
         }
 
         _logger.LogError(result.Exception, "Could not connect to server at {host}:{port}. Reason: {reason}.", result.Uri.Host, result.Uri.Port, result.FailureReason);

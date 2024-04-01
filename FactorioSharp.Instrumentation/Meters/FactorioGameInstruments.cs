@@ -5,14 +5,14 @@ namespace FactorioSharp.Instrumentation.Meters;
 
 static class FactorioGameInstruments
 {
-    public static void Setup(Meter meter, FactorioServerData serverData, FactorioGameData gameData, FactorioMeterOptionsInternal options)
+    public static void Setup(Meter meter, FactorioData data, FactorioMeterOptionsInternal options)
     {
         Dictionary<string, object?> tags = new();
-        serverData.EnrichTags(tags);
+        data.Server.EnrichTags(tags);
 
         foreach (string force in options.MeasuredForces)
         {
-            SetupForceInstruments(meter, gameData, force, tags, options);
+            SetupForceInstruments(meter, data.Game, force, tags, options);
         }
     }
 

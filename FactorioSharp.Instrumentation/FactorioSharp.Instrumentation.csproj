@@ -25,7 +25,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="FactorioSharp.Rcon" Version="0.3.9" />
+      <PackageReference Include="FactorioSharp.Rcon" Version="0.3.10" />
       <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
       <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.6.0" />
       <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="8.0.0" />

@@ -6,26 +6,19 @@ using Microsoft.Extensions.Logging;
 
 namespace FactorioSharp.Instrumentation.Integration.Jobs;
 
-class UpdateFactorioServerData : Job
+class UpdateFactorioServerMods : Job
 {
-    readonly ILogger<UpdateFactorioServerData> _logger;
+    readonly ILogger<UpdateFactorioServerMods> _logger;
 
-    public UpdateFactorioServerData(ILogger<UpdateFactorioServerData> logger)
+    public UpdateFactorioServerMods(ILogger<UpdateFactorioServerMods> logger)
     {
         _logger = logger;
     }
 
-    public override async Task OnConnectAsync(
-        FactorioRconClient client,
-        FactorioServerData serverData,
-        FactorioGameData gameData,
-        FactorioMeterOptionsInternal options,
-        CancellationToken cancellationToken
-    )
+    public override async Task OnConnectAsync(FactorioRconClient client, FactorioData data, FactorioMeterOptionsInternal _, CancellationToken __)
     {
         Dictionary<string, string> mods = await client.ReadAsync(g => g.Game.ActiveMods);
         string activeModsString = string.Join(", ", mods.Select(e => $"{e.Key} v{e.Value}"));
-
 
         if (!mods.TryGetValue("base", out string? baseVersion))
         {
@@ -37,7 +30,7 @@ class UpdateFactorioServerData : Job
             _logger.LogInformation("Active mods: {mods}", activeModsString);
         }
 
-        serverData.FactorioVersion = baseVersion;
-        serverData.Mods = mods;
+        data.Server.FactorioVersion = baseVersion;
+        data.Server.Mods = mods;
     }
 }

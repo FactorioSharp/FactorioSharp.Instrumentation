@@ -18,15 +18,9 @@ class UpdateForcesToMeasureJob : Job
         _logger = logger;
     }
 
-    public override async Task OnConnectAsync(
-        FactorioRconClient client,
-        FactorioServerData serverData,
-        FactorioGameData gameData,
-        FactorioMeterOptionsInternal options,
-        CancellationToken cancellationToken
-    )
+    public override async Task OnConnectAsync(FactorioRconClient client, FactorioData data, FactorioMeterOptionsInternal options, CancellationToken _)
     {
-        LuaCustomTable<Union66691991, LuaForce> forcePrototypeTypes = await client.ReadAsync(g => g.Game.Forces);
+        LuaCustomTable<Union2142551273, LuaForce> forcePrototypeTypes = await client.ReadAsync(g => g.Game.Forces);
         IEnumerable<string> forcePrototypes = forcePrototypeTypes.Keys.Where(k => k.IsT1).Select(k => k.AsT1);
         options.MeasuredForces = options.Original.MeasureAllForces ? forcePrototypes.ToArray() : forcePrototypes.Intersect(options.Original.MeasuredForces).ToArray();
 
@@ -34,9 +28,9 @@ class UpdateForcesToMeasureJob : Job
 
         foreach (string? force in options.MeasuredForces)
         {
-            if (!gameData.Forces.ContainsKey(force))
+            if (!data.Game.Forces.ContainsKey(force))
             {
-                gameData.Forces[force] = new FactorioForceData();
+                data.Game.Forces[force] = new FactorioForceData();
             }
         }
     }

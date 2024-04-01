@@ -1,4 +1,4 @@
-﻿using FactorioSharp.Instrumentation.OpenTelemetry;
+﻿using FactorioSharp.Instrumentation.Meters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenTelemetry.Metrics;

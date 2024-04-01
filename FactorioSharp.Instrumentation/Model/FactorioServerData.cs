@@ -13,4 +13,6 @@ public class FactorioServerData
     public string? FactorioVersion { get; set; }
     public bool IsConnected { get; set; }
     public Dictionary<string, string> Mods { get; set; } = new();
+    public string[] Players { get; set; } = Array.Empty<string>();
+    public string[] ConnectedPlayers { get; set; } = Array.Empty<string>();
 }

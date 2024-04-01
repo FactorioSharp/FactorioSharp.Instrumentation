@@ -16,11 +16,11 @@ class UpdateFluidsJob : Job
         _logger = logger;
     }
 
-    public override async Task OnTickAsync(FactorioRconClient client, FactorioGameData data, FactorioMeterOptionsInternal options, CancellationToken cancellationToken)
+    public override async Task OnTickAsync(FactorioRconClient client, FactorioData data, FactorioMeterOptionsInternal options, CancellationToken cancellationToken)
     {
         foreach (string? force in options.MeasuredForces)
         {
-            if (!data.Forces.TryGetValue(force, out FactorioForceData? forceData))
+            if (!data.Game.Forces.TryGetValue(force, out FactorioForceData? forceData))
             {
                 _logger.LogWarning("Data for force {force} not found in data", force);
                 continue;
@@ -33,8 +33,8 @@ class UpdateFluidsJob : Job
                 return;
             }
 
-            Dictionary<string, Union1732410965> fluidInputStatistics = await client.ReadAsync((g, f) => g.Game.Forces[f].FluidProductionStatistics.InputCounts, force);
-            foreach (KeyValuePair<string, Union1732410965> entry in fluidInputStatistics)
+            Dictionary<string, Union1104138130> fluidInputStatistics = await client.ReadAsync((g, f) => g.Game.Forces[f].FluidProductionStatistics.InputCounts, force);
+            foreach (KeyValuePair<string, Union1104138130> entry in fluidInputStatistics)
             {
                 flowData.Inputs[entry.Key] = entry.Value.AsT1;
             }
@@ -44,8 +44,8 @@ class UpdateFluidsJob : Job
                 return;
             }
 
-            Dictionary<string, Union1732410965> fluidOutputStatistics = await client.ReadAsync((g, f) => g.Game.Forces[f].FluidProductionStatistics.OutputCounts, force);
-            foreach (KeyValuePair<string, Union1732410965> entry in fluidOutputStatistics)
+            Dictionary<string, Union1104138130> fluidOutputStatistics = await client.ReadAsync((g, f) => g.Game.Forces[f].FluidProductionStatistics.OutputCounts, force);
+            foreach (KeyValuePair<string, Union1104138130> entry in fluidOutputStatistics)
             {
                 flowData.Outputs[entry.Key] = entry.Value.AsT1;
             }

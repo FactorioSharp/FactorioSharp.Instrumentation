@@ -16,11 +16,11 @@ class UpdateItemsJob : Job
         _logger = logger;
     }
 
-    public override async Task OnTickAsync(FactorioRconClient client, FactorioGameData data, FactorioMeterOptionsInternal options, CancellationToken cancellationToken)
+    public override async Task OnTickAsync(FactorioRconClient client, FactorioData data, FactorioMeterOptionsInternal options, CancellationToken cancellationToken)
     {
         foreach (string? force in options.MeasuredForces)
         {
-            if (!data.Forces.TryGetValue(force, out FactorioForceData? forceData))
+            if (!data.Game.Forces.TryGetValue(force, out FactorioForceData? forceData))
             {
                 _logger.LogWarning("Data for force {force} not found in data", force);
                 continue;
@@ -33,8 +33,8 @@ class UpdateItemsJob : Job
                 return;
             }
 
-            Dictionary<string, Union1732410965> itemInputStatistics = await client.ReadAsync((g, f) => g.Game.Forces[f].ItemProductionStatistics.InputCounts, force);
-            foreach (KeyValuePair<string, Union1732410965> entry in itemInputStatistics)
+            Dictionary<string, Union1104138130> itemInputStatistics = await client.ReadAsync((g, f) => g.Game.Forces[f].ItemProductionStatistics.InputCounts, force);
+            foreach (KeyValuePair<string, Union1104138130> entry in itemInputStatistics)
             {
                 flowData.Inputs[entry.Key] = entry.Value.AsT0;
             }
@@ -44,8 +44,8 @@ class UpdateItemsJob : Job
                 return;
             }
 
-            Dictionary<string, Union1732410965> itemOutputStatistics = await client.ReadAsync((g, f) => g.Game.Forces[f].ItemProductionStatistics.OutputCounts, force);
-            foreach (KeyValuePair<string, Union1732410965> entry in itemOutputStatistics)
+            Dictionary<string, Union1104138130> itemOutputStatistics = await client.ReadAsync((g, f) => g.Game.Forces[f].ItemProductionStatistics.OutputCounts, force);
+            foreach (KeyValuePair<string, Union1104138130> entry in itemOutputStatistics)
             {
                 flowData.Outputs[entry.Key] = entry.Value.AsT0;
             }

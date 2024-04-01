@@ -15,24 +15,18 @@ class UpdateFactorioServerStatus : Job
         _logger = logger;
     }
 
-    public override Task OnConnectAsync(
-        FactorioRconClient client,
-        FactorioServerData serverData,
-        FactorioGameData gameData,
-        FactorioMeterOptionsInternal options,
-        CancellationToken cancellationToken
-    )
+    public override Task OnConnectAsync(FactorioRconClient _, FactorioData data, FactorioMeterOptionsInternal __, CancellationToken ___)
     {
-        serverData.IsConnected = true;
+        data.Server.IsConnected = true;
 
         _logger.LogInformation("Server UP");
 
         return Task.CompletedTask;
     }
 
-    public override Task OnDisconnectAsync(FactorioServerData serverData, FactorioGameData gameData, FactorioMeterOptionsInternal options, CancellationToken cancellationToken)
+    public override Task OnDisconnectAsync(FactorioData data, FactorioMeterOptionsInternal _, CancellationToken __)
     {
-        serverData.IsConnected = false;
+        data.Server.IsConnected = false;
 
         _logger.LogInformation("Server DOWN");
 

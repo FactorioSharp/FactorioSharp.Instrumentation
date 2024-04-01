@@ -1,7 +1,6 @@
-﻿using FactorioSharp.Instrumentation.Meters;
-using OpenTelemetry.Metrics;
+﻿using OpenTelemetry.Metrics;
 
-namespace FactorioSharp.Instrumentation.OpenTelemetry;
+namespace FactorioSharp.Instrumentation.Meters;
 
 public static class FactorioInstrumentationOpenTelemetryMeterProviderBuilderExtensions
 {
