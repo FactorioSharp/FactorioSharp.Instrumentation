@@ -11,7 +11,7 @@ class JobCollection : IEnumerable<Job>
 
     public void Add(Job item) => _jobs.Add(item);
 
-    public async Task ExecuteOnStartAsync(FactorioServerData data, FactorioMeterOptionsInternal options, CancellationToken stoppingToken)
+    public async Task ExecuteOnStartAsync(FactorioGameData data, FactorioMeterOptionsInternal options, CancellationToken stoppingToken)
     {
         foreach (Job job in _jobs)
         {
@@ -19,7 +19,7 @@ class JobCollection : IEnumerable<Job>
         }
     }
 
-    public async Task ExecuteOnConnectAsync(FactorioServerData data, FactorioRconClient client, FactorioMeterOptionsInternal options, CancellationToken stoppingToken)
+    public async Task ExecuteOnConnectAsync(FactorioGameData data, FactorioRconClient client, FactorioMeterOptionsInternal options, CancellationToken stoppingToken)
     {
         foreach (Job job in _jobs)
         {
@@ -27,7 +27,7 @@ class JobCollection : IEnumerable<Job>
         }
     }
 
-    public async Task ExecuteOnTickAsync(FactorioServerData data, FactorioRconClient client, FactorioMeterOptionsInternal options, CancellationToken stoppingToken)
+    public async Task ExecuteOnTickAsync(FactorioGameData data, FactorioRconClient client, FactorioMeterOptionsInternal options, CancellationToken stoppingToken)
     {
         foreach (Job job in _jobs)
         {
@@ -35,7 +35,7 @@ class JobCollection : IEnumerable<Job>
         }
     }
 
-    public async Task ExecuteOnDisconnectAsync(FactorioServerData data, FactorioMeterOptionsInternal options, CancellationToken stoppingToken)
+    public async Task ExecuteOnDisconnectAsync(FactorioGameData data, FactorioMeterOptionsInternal options, CancellationToken stoppingToken)
     {
         foreach (Job job in _jobs)
         {
@@ -43,7 +43,7 @@ class JobCollection : IEnumerable<Job>
         }
     }
 
-    public async Task ExecuteOnStopAsync(FactorioServerData data, FactorioMeterOptionsInternal options, CancellationToken stoppingToken)
+    public async Task ExecuteOnStopAsync(FactorioGameData data, FactorioMeterOptionsInternal options, CancellationToken stoppingToken)
     {
         foreach (Job job in _jobs)
         {

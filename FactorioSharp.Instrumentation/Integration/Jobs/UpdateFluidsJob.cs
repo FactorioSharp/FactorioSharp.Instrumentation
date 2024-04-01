@@ -8,7 +8,7 @@ namespace FactorioSharp.Instrumentation.Integration.Jobs;
 
 class UpdateFluidsJob : Job
 {
-    public override async Task OnTickAsync(FactorioRconClient client, FactorioServerData data, FactorioMeterOptionsInternal options, CancellationToken cancellationToken)
+    public override async Task OnTickAsync(FactorioRconClient client, FactorioGameData data, FactorioMeterOptionsInternal options, CancellationToken cancellationToken)
     {
         foreach ((string force, FactorioForceData? value) in data.Forces)
         {

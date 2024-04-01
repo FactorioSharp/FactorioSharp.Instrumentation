@@ -2,8 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using MeterProviderBuilder = OpenTelemetry.Metrics.MeterProviderBuilder;
-using OpenTelemetryDependencyInjectionMeterProviderBuilderExtensions = OpenTelemetry.Metrics.OpenTelemetryDependencyInjectionMeterProviderBuilderExtensions;
+using OpenTelemetry.Metrics;
 
 namespace FactorioSharp.Instrumentation.Meters;
 
@@ -27,11 +26,10 @@ public static class FactorioInstrumentationMeterProviderBuilderExtensions
     {
         if (configureOptions != null)
         {
-            OpenTelemetryDependencyInjectionMeterProviderBuilderExtensions.ConfigureServices(builder, services => services.Configure(configureOptions));
+            builder.ConfigureServices(services => services.Configure(configureOptions));
         }
 
-        OpenTelemetryDependencyInjectionMeterProviderBuilderExtensions.ConfigureServices(
-            builder,
+        builder.ConfigureServices(
             services =>
             {
                 services.AddHostedService<FactorioInstrumentationBackgroundWorker>(
