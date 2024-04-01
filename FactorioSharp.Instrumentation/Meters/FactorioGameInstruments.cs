@@ -5,62 +5,69 @@ namespace FactorioSharp.Instrumentation.Meters;
 
 static class FactorioGameInstruments
 {
-    public static void Setup(Meter meter, FactorioGameData data, FactorioMeterOptionsInternal options)
+    public static void Setup(Meter meter, FactorioServerData serverData, FactorioGameData gameData, FactorioMeterOptionsInternal options)
     {
+        Dictionary<string, object?> tags = new();
+        serverData.EnrichTags(tags);
+
         foreach (string force in options.MeasuredForces)
         {
-            SetupForceInstruments(meter, data, force, options);
+            SetupForceInstruments(meter, gameData, force, tags, options);
         }
     }
 
-    static void SetupForceInstruments(Meter meter, FactorioGameData data, string force, FactorioMeterOptionsInternal options)
+    static void SetupForceInstruments(Meter meter, FactorioGameData gameData, string force, Dictionary<string, object?> tags, FactorioMeterOptionsInternal options)
     {
         foreach (string item in options.MeasuredItems)
         {
-            SetupItemInstruments(meter, data, force, item);
+            SetupItemInstruments(meter, gameData, force, item, tags);
         }
 
         foreach (string fluid in options.MeasuredFluids)
         {
-            SetupFluidInstruments(meter, data, force, fluid);
+            SetupFluidInstruments(meter, gameData, force, fluid, tags);
         }
     }
 
-    static void SetupItemInstruments(Meter meter, FactorioGameData data, string force, string item)
+    static void SetupItemInstruments(Meter meter, FactorioGameData gameData, string force, string item, Dictionary<string, object?> baseTags)
     {
+        Dictionary<string, object?> tags = new(baseTags) { { "factorio.prototype.kind", "item" } };
+
         meter.CreateObservableCounter(
             $"factorio.game.{force}.production.{item}.input",
-            () => (long)(data.Forces.GetValueOrDefault(force)?.Production.Item.Inputs.GetValueOrDefault(item) ?? default),
+            () => (long)(gameData.Forces.GetValueOrDefault(force)?.Production.Item.Inputs.GetValueOrDefault(item) ?? default),
             "{item}",
             $"The number of {item} that has been produced by force {force}",
-            new Dictionary<string, object?> { { "factorio.prototype.kind", "item" } }
+            tags
         );
 
         meter.CreateObservableCounter(
-            $"factorio.game.force.{force}.production.item.{item}.output",
-            () => (long)(data.Forces.GetValueOrDefault(force)?.Production.Item.Outputs.GetValueOrDefault(item) ?? default),
+            $"factorio.game.{force}.production.{item}.output",
+            () => (long)(gameData.Forces.GetValueOrDefault(force)?.Production.Item.Outputs.GetValueOrDefault(item) ?? default),
             "{item}",
             $"The number of {item} that has been consumed by force {force}",
-            new Dictionary<string, object?> { { "factorio.prototype.kind", "item" } }
+            tags
         );
     }
 
-    static void SetupFluidInstruments(Meter meter, FactorioGameData data, string force, string fluid)
+    static void SetupFluidInstruments(Meter meter, FactorioGameData gameData, string force, string fluid, Dictionary<string, object?> baseTags)
     {
+        Dictionary<string, object?> tags = new(baseTags) { { "factorio.prototype.kind", "fluid" } };
+
         meter.CreateObservableCounter(
             $"factorio.game.{force}.production.{fluid}.input",
-            () => data.Forces.GetValueOrDefault(force)?.Production.Fluid.Inputs.GetValueOrDefault(fluid) ?? default,
+            () => gameData.Forces.GetValueOrDefault(force)?.Production.Fluid.Inputs.GetValueOrDefault(fluid) ?? default,
             "{volume}",
             $"The quantity of {fluid} that has been produced by force {force}",
-            new Dictionary<string, object?> { { "factorio.prototype.kind", "fluid" } }
+            tags
         );
 
         meter.CreateObservableCounter(
             $"factorio.game.{force}.production.{fluid}.output",
-            () => data.Forces.GetValueOrDefault(force)?.Production.Fluid.Outputs.GetValueOrDefault(fluid) ?? default,
+            () => gameData.Forces.GetValueOrDefault(force)?.Production.Fluid.Outputs.GetValueOrDefault(fluid) ?? default,
             "{volume}",
             $"The quantity of {fluid} that has been consumed by force {force}",
-            new Dictionary<string, object?> { { "factorio.prototype.kind", "fluid" } }
+            tags
         );
     }
 }

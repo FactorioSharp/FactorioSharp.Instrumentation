@@ -17,7 +17,13 @@ class UpdateFluidsToMeasureJob : Job
         _logger = logger;
     }
 
-    public override async Task OnConnectAsync(FactorioRconClient client, FactorioGameData data, FactorioMeterOptionsInternal options, CancellationToken cancellationToken)
+    public override async Task OnConnectAsync(
+        FactorioRconClient client,
+        FactorioServerData serverData,
+        FactorioGameData gameData,
+        FactorioMeterOptionsInternal options,
+        CancellationToken cancellationToken
+    )
     {
         LuaCustomTable<string, LuaFluidPrototype> fluidPrototypesTable = await client.ReadAsync(g => g.Game.FluidPrototypes);
         IEnumerable<string> fluidPrototypes = fluidPrototypesTable.Keys;

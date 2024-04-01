@@ -8,21 +8,7 @@ namespace FactorioSharp.Instrumentation.Meters;
 
 public static class FactorioInstrumentationMeterProviderBuilderExtensions
 {
-    public static MeterProviderBuilder AddFactorioInstrumentation(
-        this MeterProviderBuilder builder,
-        string host,
-        string password,
-        Action<FactorioMeterOptions>? configureExporterOptions = null
-    ) =>
-        AddFactorioInstrumentation(builder, host, 27015, password, configureExporterOptions);
-
-    public static MeterProviderBuilder AddFactorioInstrumentation(
-        this MeterProviderBuilder builder,
-        string host,
-        int port,
-        string password,
-        Action<FactorioMeterOptions>? configureOptions = null
-    )
+    public static MeterProviderBuilder AddFactorioInstrumentation(this MeterProviderBuilder builder, Action<FactorioInstrumentationOptions>? configureOptions = null)
     {
         if (configureOptions != null)
         {
@@ -33,13 +19,23 @@ public static class FactorioInstrumentationMeterProviderBuilderExtensions
             services =>
             {
                 services.AddHostedService<FactorioInstrumentationBackgroundWorker>(
-                    s => new FactorioInstrumentationBackgroundWorker(
-                        host,
-                        port,
-                        password,
-                        s.GetRequiredService<IOptions<FactorioMeterOptions>>(),
-                        s.GetRequiredService<ILoggerFactory>()
-                    )
+                    s =>
+                    {
+                        IOptions<FactorioInstrumentationOptions> options = s.GetRequiredService<IOptions<FactorioInstrumentationOptions>>();
+                        ILoggerFactory loggerFactory = s.GetRequiredService<ILoggerFactory>();
+
+                        if (options.Value.Server.Uri == null)
+                        {
+                            throw new InvalidOperationException("Factorio server URI must be configured");
+                        }
+
+                        if (options.Value.Server.RconPassword == null)
+                        {
+                            throw new InvalidOperationException("Factorio server RCON password must be configured");
+                        }
+
+                        return new FactorioInstrumentationBackgroundWorker(options, loggerFactory);
+                    }
                 );
 
                 builder.AddMeter(FactorioInstrumentationBackgroundWorker.MeterName);

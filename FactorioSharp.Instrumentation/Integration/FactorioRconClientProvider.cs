@@ -6,15 +6,13 @@ namespace FactorioSharp.Instrumentation.Integration;
 public class FactorioRconClientProvider : IDisposable
 {
     FactorioRconClient? _client;
-    readonly string _host;
-    readonly int _port;
+    readonly Uri _uri;
     readonly string _password;
     readonly ILogger<FactorioRconClientProvider> _logger;
 
-    public FactorioRconClientProvider(string host, int port, string password, ILogger<FactorioRconClientProvider> logger)
+    public FactorioRconClientProvider(Uri uri, string password, ILogger<FactorioRconClientProvider> logger)
     {
-        _host = host;
-        _port = port;
+        _uri = uri;
         _password = password;
         _logger = logger;
 
@@ -32,42 +30,43 @@ public class FactorioRconClientProvider : IDisposable
         {
             if (_client is { Connected: true })
             {
-                return GetConnectedClientResult.Success(_host, _port, _client);
+                return GetConnectedClientResult.Success(_uri, _client);
             }
 
             if (_client != null)
             {
-                _logger.LogDebug("Connection to {host}:{port} has been lost, reconnection attempt...", _host, _port);
+                _logger.LogDebug("Connection to {uri} has been lost, reconnection attempt...", _uri);
                 _client.Dispose();
             }
             else
             {
-                _logger.LogDebug("Connection attempt to {host}:{port}...", _host, _port);
+                _logger.LogDebug("Connection attempt to {uri}...", _uri);
             }
 
-            _client = new FactorioRconClient(_host, _port);
+            _client = new FactorioRconClient(_uri.Host, _uri.Port);
 
 
             if (await _client.ConnectAsync(_password))
             {
-                _logger.LogDebug("Connected to {host}:{port}.", _host, _port);
-                return GetConnectedClientResult.Success(_host, _port, _client);
+                _logger.LogDebug("Connected to {uri}.", _uri);
+                return GetConnectedClientResult.Success(_uri, _client);
             }
 
-            _logger.LogDebug("Connection to {host}:{port} failed.", _host, _port);
+            _logger.LogDebug("Connection to {uri} failed.", _uri);
 
             _client.Dispose();
             _client = null;
-            return GetConnectedClientResult.Failure(_host, _port, $"Connection or authentication to {_host}:{_port} failed, double check the host, port and password.");
+            return GetConnectedClientResult.Failure(_uri, $"Connection or authentication to {_uri} failed, double check the host, port and password.");
         }
         catch (Exception exn)
         {
-            return GetConnectedClientResult.Failure(_host, _port, exn);
+            return GetConnectedClientResult.Failure(_uri, exn);
         }
     }
 
     public class GetConnectedClientResult
     {
+        readonly Uri _uri;
         public bool Succeeded => Client != null;
         public string Host { get; }
         public int Port { get; }
@@ -75,18 +74,17 @@ public class FactorioRconClientProvider : IDisposable
         public string? FailureReason { get; }
         public Exception? Exception { get; }
 
-        GetConnectedClientResult(string host, int port, FactorioRconClient? client, string? failureReason, Exception? exception)
+        GetConnectedClientResult(Uri uri, FactorioRconClient? client, string? failureReason, Exception? exception)
         {
-            Host = host;
-            Port = port;
+            _uri = uri;
             Client = client;
             FailureReason = failureReason;
             Exception = exception;
         }
 
-        public static GetConnectedClientResult Success(string host, int port, FactorioRconClient client) => new(host, port, client, null, null);
-        public static GetConnectedClientResult Failure(string host, int port, Exception exception) => new(host, port, null, exception.Message, exception);
-        public static GetConnectedClientResult Failure(string host, int port, string reason) => new(host, port, null, reason, null);
+        public static GetConnectedClientResult Success(Uri uri, FactorioRconClient client) => new(uri, client, null, null);
+        public static GetConnectedClientResult Failure(Uri uri, Exception exception) => new(uri, null, exception.Message, exception);
+        public static GetConnectedClientResult Failure(Uri uri, string reason) => new(uri, null, reason, null);
     }
 
     public void Dispose()
