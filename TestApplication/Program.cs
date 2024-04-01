@@ -1,6 +1,7 @@
 ﻿using FactorioSharp.Instrumentation.Meters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using OpenTelemetry.Exporter;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 
@@ -15,7 +16,13 @@ builder.Services.AddOpenTelemetry()
         {
             metricsBuilder.ConfigureResource(resource => resource.AddService(serviceName, serviceVersion))
                 .AddFactorioInstrumentation("127.0.0.1", 27015, "password")
-                .AddPrometheusHttpListener(options => options.UriPrefixes = ["http://localhost:9184/"]);
+                .AddOtlpExporter(
+                    options =>
+                    {
+                        options.Endpoint = new Uri("http://localhost:9184/");
+                        options.Protocol = OtlpExportProtocol.Grpc;
+                    }
+                );
         }
     );
 

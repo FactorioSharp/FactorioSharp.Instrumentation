@@ -25,5 +25,13 @@ class UpdateForcesToMeasureJob : Job
         options.MeasuredForces = options.Original.MeasureAllForces ? forcePrototypes.ToArray() : forcePrototypes.Intersect(options.Original.MeasuredForces).ToArray();
 
         _logger.LogInformation("Measured forces: {forces}", string.Join(", ", options.MeasuredForces));
+
+        foreach (string? force in options.MeasuredForces)
+        {
+            if (!data.Forces.ContainsKey(force))
+            {
+                data.Forces[force] = new FactorioForceData();
+            }
+        }
     }
 }

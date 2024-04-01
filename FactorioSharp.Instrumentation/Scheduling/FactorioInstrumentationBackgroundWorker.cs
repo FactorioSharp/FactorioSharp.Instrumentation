@@ -35,15 +35,17 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
 
         _serverData = new FactorioServerData();
         _gameData = new FactorioGameData();
+
         _meter = CreateMeter();
+        FactorioServerInstruments.Setup(_meter, _serverData, _options);
 
         _jobs = new JobCollection
         {
             new UpdateForcesToMeasureJob(loggerFactory.CreateLogger<UpdateForcesToMeasureJob>()),
             new UpdateItemsToMeasureJob(loggerFactory.CreateLogger<UpdateItemsToMeasureJob>()),
             new UpdateFluidsToMeasureJob(loggerFactory.CreateLogger<UpdateFluidsToMeasureJob>()),
-            new UpdateItemsJob(),
-            new UpdateFluidsJob()
+            new UpdateItemsJob(loggerFactory.CreateLogger<UpdateItemsJob>()),
+            new UpdateFluidsJob(loggerFactory.CreateLogger<UpdateFluidsJob>())
         };
     }
 

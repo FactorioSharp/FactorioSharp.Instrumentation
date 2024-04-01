@@ -1,4 +1,6 @@
-﻿namespace FactorioSharp.Instrumentation.Model;
+﻿using System.Collections.Concurrent;
+
+namespace FactorioSharp.Instrumentation.Model;
 
 /// <summary>
 ///     Data collected from the Factorio server.
@@ -7,5 +9,5 @@
 class FactorioGameData
 {
     public string[] ItemPrototypes { get; set; } = Array.Empty<string>();
-    public Dictionary<string, FactorioForceData> Forces { get; } = new();
+    public ConcurrentDictionary<string, FactorioForceData> Forces { get; } = new();
 }

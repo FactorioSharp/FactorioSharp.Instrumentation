@@ -1,7 +1,9 @@
+using System.Collections.Concurrent;
+
 namespace FactorioSharp.Instrumentation.Model;
 
 class FactorioFlowData<TValue>
 {
-    public Dictionary<string, TValue> Inputs { get; } = new();
-    public Dictionary<string, TValue> Outputs { get; } = new();
+    public ConcurrentDictionary<string, TValue> Inputs { get; } = new();
+    public ConcurrentDictionary<string, TValue> Outputs { get; } = new();
 }
