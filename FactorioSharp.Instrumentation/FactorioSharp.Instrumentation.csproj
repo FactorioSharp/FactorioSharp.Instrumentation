@@ -26,8 +26,16 @@
     <ItemGroup>
       <PackageReference Include="FactorioSharp.Rcon" Version="0.3.10" />
       <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
+      <PackageReference Include="MinVer" Version="5.0.0">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
       <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.6.0" />
       <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="8.0.0" />
     </ItemGroup>
 
+    <PropertyGroup>
+        <MinVerTagPrefix>v</MinVerTagPrefix>
+    </PropertyGroup>
+    
 </Project>
