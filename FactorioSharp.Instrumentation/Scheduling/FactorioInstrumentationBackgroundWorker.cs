@@ -15,9 +15,6 @@ namespace FactorioSharp.Instrumentation.Scheduling;
 /// </summary>
 class FactorioInstrumentationBackgroundWorker : BackgroundService
 {
-    public static readonly string MeterName = typeof(FactorioInstrumentationBackgroundWorker).Assembly.GetName().Name!;
-    public static readonly string MeterVersion = typeof(FactorioInstrumentationBackgroundWorker).Assembly.GetName().Version!.ToString();
-
     readonly FactorioRconClientProvider _clientProvider;
     bool _isConnected;
     readonly FactorioMeterOptionsInternal _options;
@@ -143,5 +140,5 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
         _logger.LogError(result.Exception, "Could not connect to server at {host}:{port}. Reason: {reason}.", result.Host, result.Port, result.FailureReason);
     }
 
-    Meter CreateMeter() => new(MeterName, MeterVersion);
+    Meter CreateMeter() => new(FactorioInstrumentationConstants.MeterName, FactorioInstrumentationConstants.MeterVersion);
 }

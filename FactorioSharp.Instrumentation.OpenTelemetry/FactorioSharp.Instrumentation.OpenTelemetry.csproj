@@ -6,13 +6,13 @@
         <Nullable>enable</Nullable>
         <LangVersion>12</LangVersion>
         <Version>0.2.3</Version>
-        <Title>Factorio Instrumentation</Title>
+        <Title>Factorio OpenTelemetry Instrumentation</Title>
         <Authors>Ismail Bennani</Authors>
         <Description>Factorio OpenTelemetry instrumentation for .NET Standard 2.1</Description>
         <NeutralLanguage>en</NeutralLanguage>
         <Copyright>Ismail Bennani</Copyright>
-        <PackageProjectUrl>https://github.com/FactorioSharp/FactorioSharp.Instrumentation/tree/main</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/FactorioSharp/FactorioSharp.Instrumentation/tree/main</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/FactorioSharp/FactorioSharp.Instrumentation</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/FactorioSharp/FactorioSharp.Instrumentation</RepositoryUrl>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -22,13 +22,16 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="README.md" Pack="true" PackagePath="" />
+        <None Include="../README.md" Pack="true" PackagePath="" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="FactorioSharp.Rcon" Version="0.3.8" />
-      <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
-      <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="8.0.0" />
+        <PackageReference Condition="'$(Configuration)'=='Release'" Include="FactorioSharp.Instrumentation" Version="0.2.3" />
+        <PackageReference Include="OpenTelemetry" Version="1.6.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Condition="'$(Configuration)'=='Debug'" Include="..\FactorioSharp.Instrumentation\FactorioSharp.Instrumentation.csproj" />
+    </ItemGroup>
+    
 </Project>

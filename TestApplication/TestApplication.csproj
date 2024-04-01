@@ -14,7 +14,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\FactorioSharp.Instrumentation\FactorioSharp.Instrumentation.csproj" />
+      <ProjectReference Include="..\FactorioSharp.Instrumentation.OpenTelemetry\FactorioSharp.Instrumentation.OpenTelemetry.csproj" />
     </ItemGroup>
 
     <ItemGroup>

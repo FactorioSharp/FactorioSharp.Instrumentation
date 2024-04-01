@@ -36,7 +36,7 @@ class UpdateFluidsJob : Job
             Dictionary<string, Union1732410965> fluidInputStatistics = await client.ReadAsync((g, f) => g.Game.Forces[f].FluidProductionStatistics.InputCounts, force);
             foreach (KeyValuePair<string, Union1732410965> entry in fluidInputStatistics)
             {
-                flowData.Inputs[entry.Key] = entry.Value.AsT0;
+                flowData.Inputs[entry.Key] = entry.Value.AsT1;
             }
 
             if (cancellationToken.IsCancellationRequested)
@@ -47,7 +47,7 @@ class UpdateFluidsJob : Job
             Dictionary<string, Union1732410965> fluidOutputStatistics = await client.ReadAsync((g, f) => g.Game.Forces[f].FluidProductionStatistics.OutputCounts, force);
             foreach (KeyValuePair<string, Union1732410965> entry in fluidOutputStatistics)
             {
-                flowData.Outputs[entry.Key] = entry.Value.AsT0;
+                flowData.Outputs[entry.Key] = entry.Value.AsT1;
             }
         }
     }
