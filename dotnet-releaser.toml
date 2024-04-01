@@ -1,7 +1,7 @@
 profile = "default"
 
 [msbuild]
-project = ["./FactorioSharp.Instrumentation/FactorioSharp.Instrumentation.csproj"]
+project = ["./FactorioSharp.Instrumentation/FactorioSharp.Instrumentation.csproj", "./FactorioSharp.Instrumentation.OpenTelemetry/FactorioSharp.Instrumentation.OpenTelemetry.csproj"]
 
 [github]
 user = "FactorioSharp"

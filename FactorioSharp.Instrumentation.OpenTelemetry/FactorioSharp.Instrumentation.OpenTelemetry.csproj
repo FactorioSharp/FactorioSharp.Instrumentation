@@ -26,7 +26,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Condition="'$(Configuration)'=='Release'" Include="FactorioSharp.Instrumentation" Version="0.2.3" />
+        <PackageReference Condition="'$(Configuration)'=='Release'" Include="FactorioSharp.Instrumentation" Version="0.2.4" />
         <PackageReference Include="OpenTelemetry" Version="1.6.0" />
     </ItemGroup>
 

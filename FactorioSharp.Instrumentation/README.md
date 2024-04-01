@@ -7,4 +7,5 @@ The orchestration is performed by a background service that must be added to the
 
 Note: Managing activities for the commands that are executed on the RCON is a **WIP**.
 
-This project has been created with OpenTelemetry in mind, see the `FactorioSharp.Instrumentation.OpenTelemetry` project.
+This project uses the Microsoft abstractions for metrics (see [System.Diagnostics.Metrics](https://learn.microsoft.com/fr-fr/dotnet/api/system.diagnostics.metrics)) and doesn't require OpenTelemetry to work. However
+it has been created with OpenTelemetry in mind, and has only been tested using the OpenTelemetry exporters. See the `FactorioSharp.Instrumentation.OpenTelemetry` project.
