@@ -2,10 +2,10 @@ name: .NET - Build and Publish
 
 on:
   push:
-    paths-ignore:
-    - 'changelog.md'
-    - 'readme.md'
-  workflow_dispatch:
+    branches:
+    - main
+    tags: 
+    - v*
 
 jobs:
   build:
@@ -13,6 +13,19 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+    - name: Get version from tag
+      uses: jannemattila/get-version-from-tag@v3
+      id: get_version
+      
+    - name: Append version
+      uses: "DamianReeves/write-file-action@master"
+      with:
+        path: dotnet-releaser.toml
+        write-mode: append
+        contents: |
+            [msbuild.properties]
+            Version = "{{ steps.get_version.outputs.version }}"
+    
     - name: Checkout
       uses: actions/checkout@v4
       with:
