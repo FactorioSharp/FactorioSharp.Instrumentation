@@ -5,20 +5,10 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <LangVersion>12</LangVersion>
-        <Version>0.2.4</Version>
         <Title>Factorio OpenTelemetry Instrumentation</Title>
-        <Authors>Ismail Bennani</Authors>
         <Description>Factorio OpenTelemetry instrumentation for .NET Standard 2.1</Description>
-        <NeutralLanguage>en</NeutralLanguage>
-        <Copyright>Ismail Bennani</Copyright>
-        <PackageProjectUrl>https://github.com/FactorioSharp/FactorioSharp.Instrumentation</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/FactorioSharp/FactorioSharp.Instrumentation</RepositoryUrl>
-        <PublishRepositoryUrl>true</PublishRepositoryUrl>
-        <RepositoryType>git</RepositoryType>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <RepositoryType>git</RepositoryType>
-        <PackageTags>factorio, instrumentation, opentelemetry, telemetry</PackageTags>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageTags>factorio, instrumentation, opentelemetry, diagnostics, metrics, telemetry</PackageTags>
     </PropertyGroup>
 
     <ItemGroup>

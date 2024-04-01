@@ -1,0 +1,13 @@
+<Project>
+    <PropertyGroup>
+        <Version>0.2.4</Version>
+        <Authors>Ismail Bennani</Authors>
+        <NeutralLanguage>en</NeutralLanguage>
+        <Copyright>Ismail Bennani</Copyright>
+        <PackageProjectUrl>https://github.com/FactorioSharp/FactorioSharp.Instrumentation/tree/main</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/FactorioSharp/FactorioSharp.Instrumentation/tree/main</RepositoryUrl>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    </PropertyGroup>
+</Project>
