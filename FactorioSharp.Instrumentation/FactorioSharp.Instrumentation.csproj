@@ -7,6 +7,15 @@
         <LangVersion>12</LangVersion>
         <Title>Factorio Instrumentation</Title>
         <Description>Factorio instrumentation for .NET Standard 2.1</Description>
+        <Version>0.2.7</Version>
+        <Authors>Ismail Bennani</Authors>
+        <NeutralLanguage>en</NeutralLanguage>
+        <Copyright>Ismail Bennani</Copyright>
+        <PackageProjectUrl>https://github.com/FactorioSharp/FactorioSharp.Instrumentation/tree/main</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/FactorioSharp/FactorioSharp.Instrumentation/tree/main</RepositoryUrl>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageTags>factorio, instrumentation, diagnostics, metrics, telemetry</PackageTags>
     </PropertyGroup>
@@ -16,8 +25,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="FactorioSharp.Rcon" Version="0.3.8" />
+      <PackageReference Include="FactorioSharp.Rcon" Version="0.3.9" />
       <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
+      <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.6.0" />
       <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="8.0.0" />
     </ItemGroup>
 
