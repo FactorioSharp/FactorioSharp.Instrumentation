@@ -4,13 +4,13 @@ using FactorioSharp.Instrumentation.Scheduling;
 using FactorioSharp.Rcon;
 using Microsoft.Extensions.Logging;
 
-namespace FactorioSharp.Instrumentation.Integration.Jobs;
+namespace FactorioSharp.Instrumentation.Integration.Jobs.Server;
 
-class UpdateFactorioServerPlayers : Job
+class UpdateServerPlayersJob : Job
 {
-    readonly ILogger<UpdateFactorioServerPlayers> _logger;
+    readonly ILogger<UpdateServerPlayersJob> _logger;
 
-    public UpdateFactorioServerPlayers(ILogger<UpdateFactorioServerPlayers> logger)
+    public UpdateServerPlayersJob(ILogger<UpdateServerPlayersJob> logger)
     {
         _logger = logger;
     }
@@ -22,18 +22,28 @@ class UpdateFactorioServerPlayers : Job
         List<string> players = [];
         for (int index = 0; index < totalPlayerCount; index++)
         {
-            string player = await client.ReadAsync((g, i) => g.Game.Players[i + 1].Name, (uint)index);
+            string? player = await client.ReadAsync((g, i) => g.Game.Players[i + 1].Name, (uint)index);
+            if (player == null)
+            {
+                continue;
+            }
+
             players.Add(player);
         }
 
         data.Server.Players = players.ToArray();
 
-        int connectedPlayerCount = await client.ReadAsync(g => g.Game.ConnectedPlayers.Length);
+        int connectedPlayerCount = await client.ReadAsync(g => g.Game.ConnectedPlayers.Count);
 
         List<string> connectedPlayers = [];
         for (int index = 0; index < connectedPlayerCount; index++)
         {
-            string player = await client.ReadAsync((g, i) => g.Game.ConnectedPlayers[i + 1].Name, index);
+            string? player = await client.ReadAsync((g, i) => g.Game.ConnectedPlayers[i + 1].Name, index);
+            if (player == null)
+            {
+                continue;
+            }
+
             connectedPlayers.Add(player);
         }
 

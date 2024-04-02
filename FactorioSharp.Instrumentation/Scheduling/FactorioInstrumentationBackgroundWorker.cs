@@ -1,9 +1,10 @@
 ﻿using System.Diagnostics.Metrics;
 using FactorioSharp.Instrumentation.Integration;
 using FactorioSharp.Instrumentation.Integration.Jobs;
+using FactorioSharp.Instrumentation.Integration.Jobs.Production;
+using FactorioSharp.Instrumentation.Integration.Jobs.Server;
 using FactorioSharp.Instrumentation.Meters;
 using FactorioSharp.Instrumentation.Model;
-using FactorioSharp.Rcon;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -42,14 +43,14 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
 
         _jobs = new JobCollection(loggerFactory.CreateLogger<JobCollection>())
         {
-            new UpdateFactorioServerStatus(loggerFactory.CreateLogger<UpdateFactorioServerStatus>()),
-            new UpdateFactorioServerMods(loggerFactory.CreateLogger<UpdateFactorioServerMods>()),
-            new UpdateFactorioServerPlayers(loggerFactory.CreateLogger<UpdateFactorioServerPlayers>()),
-            new UpdateForcesToMeasureJob(loggerFactory.CreateLogger<UpdateForcesToMeasureJob>()),
-            new UpdateItemsToMeasureJob(loggerFactory.CreateLogger<UpdateItemsToMeasureJob>()),
-            new UpdateFluidsToMeasureJob(loggerFactory.CreateLogger<UpdateFluidsToMeasureJob>()),
+            new UpdateServerStatusJob(loggerFactory.CreateLogger<UpdateServerStatusJob>()),
+            new UpdateServerModsJob(loggerFactory.CreateLogger<UpdateServerModsJob>()),
+            new UpdateServerPlayersJob(loggerFactory.CreateLogger<UpdateServerPlayersJob>()),
+            new UpdateSurfacesJob(loggerFactory.CreateLogger<UpdateSurfacesJob>()),
+            new UpdateForcesJob(loggerFactory.CreateLogger<UpdateForcesJob>()),
             new UpdateItemsJob(loggerFactory.CreateLogger<UpdateItemsJob>()),
-            new UpdateFluidsJob(loggerFactory.CreateLogger<UpdateFluidsJob>())
+            new UpdateFluidsJob(loggerFactory.CreateLogger<UpdateFluidsJob>()),
+            new UpdateMineableResourcesJob(loggerFactory.CreateLogger<UpdateMineableResourcesJob>())
         };
     }
 
@@ -83,7 +84,24 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
             FactorioRconClientProvider.GetConnectedClientResult result = await _clientProvider.TryGetConnectedClient();
             if (result.Succeeded)
             {
-                await HandleTick(result.Client!, stoppingToken);
+                if (!_isConnected)
+                {
+                    _logger.LogInformation("Connection with server acquired, reading initial data...");
+
+                    _isConnected = true;
+
+                    await _jobs.ExecuteOnConnectAsync(_data, result.Client!, _options, stoppingToken);
+
+                    if (_meter == null)
+                    {
+                        _meter = CreateMeter();
+                        FactorioServerInstruments.Setup(_meter, _data.Server, _options);
+                    }
+
+                    FactorioGameInstruments.Setup(_meter, _data, _options);
+                }
+
+                await _jobs.ExecuteOnTickAsync(_data, result.Client!, _options, stoppingToken);
 
                 TimeSpan elapsed = DateTime.Now - startTime;
                 TimeSpan toWait = minDelayBetweenObservations - elapsed;
@@ -95,48 +113,25 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
             }
             else
             {
-                await HandleConnectionFailed(result, stoppingToken);
+                if (_isConnected)
+                {
+                    _logger.LogInformation("Connection with server lost.");
+
+                    _isConnected = false;
+
+                    await _jobs.ExecuteOnDisconnectAsync(_data, _options, stoppingToken);
+
+                    _meter?.Dispose();
+                    _meter = CreateMeter();
+                    FactorioServerInstruments.Setup(_meter, _data.Server, _options);
+                }
+
+                _logger.LogError(result.Exception, "Could not connect to server at {host}:{port}. Reason: {reason}.", result.Uri.Host, result.Uri.Port, result.FailureReason);
                 await Task.Delay(minDelayBetweenConnectionAttempts, stoppingToken);
             }
         }
 
         await _jobs.ExecuteOnStopAsync(_data, _options, stoppingToken);
-    }
-
-    async Task HandleTick(FactorioRconClient client, CancellationToken stoppingToken)
-    {
-        if (!_isConnected)
-        {
-            _isConnected = true;
-
-            await _jobs.ExecuteOnConnectAsync(_data, client, _options, stoppingToken);
-
-            if (_meter == null)
-            {
-                _meter = CreateMeter();
-                FactorioServerInstruments.Setup(_meter, _data.Server, _options);
-            }
-
-            FactorioGameInstruments.Setup(_meter, _data, _options);
-        }
-
-        await _jobs.ExecuteOnTickAsync(_data, client, _options, stoppingToken);
-    }
-
-    async Task HandleConnectionFailed(FactorioRconClientProvider.GetConnectedClientResult result, CancellationToken stoppingToken)
-    {
-        if (_isConnected)
-        {
-            _isConnected = false;
-
-            await _jobs.ExecuteOnDisconnectAsync(_data, _options, stoppingToken);
-
-            _meter?.Dispose();
-            _meter = CreateMeter();
-            FactorioServerInstruments.Setup(_meter, _data.Server, _options);
-        }
-
-        _logger.LogError(result.Exception, "Could not connect to server at {host}:{port}. Reason: {reason}.", result.Uri.Host, result.Uri.Port, result.FailureReason);
     }
 
     Meter CreateMeter() => new(FactorioInstrumentationConstants.MeterName, FactorioInstrumentationConstants.MeterVersion);

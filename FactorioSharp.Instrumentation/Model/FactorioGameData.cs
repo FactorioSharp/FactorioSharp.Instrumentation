@@ -8,6 +8,8 @@ namespace FactorioSharp.Instrumentation.Model;
 /// </summary>
 class FactorioGameData
 {
-    public string[] ItemPrototypes { get; set; } = Array.Empty<string>();
+    public MineableResource[] MineableResources { get; set; } = Array.Empty<MineableResource>();
+
+    public ConcurrentDictionary<string, FactorioSurfaceData> Surfaces { get; } = new();
     public ConcurrentDictionary<string, FactorioForceData> Forces { get; } = new();
 }

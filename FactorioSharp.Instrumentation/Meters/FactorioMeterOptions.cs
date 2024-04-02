@@ -16,6 +16,16 @@ public class FactorioMeterOptions
     public HashSet<string> MeasuredForces { get; } = ["player"];
 
     /// <summary>
+    ///     If set to true, the value of <see cref="MeasuredSurfaces" /> will be ignored and all the available surfaces will be measured instead
+    /// </summary>
+    public bool MeasureAllSurfaces { get; set; } = true;
+
+    /// <summary>
+    ///     The surfaces that should be measured
+    /// </summary>
+    public HashSet<string> MeasuredSurfaces { get; } = [];
+
+    /// <summary>
     ///     If set to true, the value of <see cref="MeasuredItems" /> will be ignored and all the available items will be measured instead
     /// </summary>
     public bool MeasureAllItems { get; set; } = true;

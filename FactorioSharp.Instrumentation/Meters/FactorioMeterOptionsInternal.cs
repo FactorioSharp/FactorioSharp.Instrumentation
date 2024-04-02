@@ -12,11 +12,13 @@ class FactorioMeterOptionsInternal
         Original = original;
 
         MeasuredForces = original.MeasuredForces.ToArray();
+        MeasuredSurfaces = original.MeasuredSurfaces.ToArray();
         MeasuredItems = original.MeasuredItems.ToArray();
         MeasuredFluids = original.MeasuredFluids.ToArray();
     }
 
     public IReadOnlyCollection<string> MeasuredForces { get; set; }
+    public IReadOnlyCollection<string> MeasuredSurfaces { get; set; }
     public IReadOnlyCollection<string> MeasuredItems { get; set; }
     public IReadOnlyCollection<string> MeasuredFluids { get; set; }
 

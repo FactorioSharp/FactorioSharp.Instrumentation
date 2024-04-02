@@ -4,20 +4,20 @@ using FactorioSharp.Instrumentation.Scheduling;
 using FactorioSharp.Rcon;
 using Microsoft.Extensions.Logging;
 
-namespace FactorioSharp.Instrumentation.Integration.Jobs;
+namespace FactorioSharp.Instrumentation.Integration.Jobs.Server;
 
-class UpdateFactorioServerMods : Job
+class UpdateServerModsJob : Job
 {
-    readonly ILogger<UpdateFactorioServerMods> _logger;
+    readonly ILogger<UpdateServerModsJob> _logger;
 
-    public UpdateFactorioServerMods(ILogger<UpdateFactorioServerMods> logger)
+    public UpdateServerModsJob(ILogger<UpdateServerModsJob> logger)
     {
         _logger = logger;
     }
 
     public override async Task OnConnectAsync(FactorioRconClient client, FactorioData data, FactorioMeterOptionsInternal _, CancellationToken __)
     {
-        Dictionary<string, string> mods = await client.ReadAsync(g => g.Game.ActiveMods);
+        Dictionary<string, string> mods = await client.ReadAsync(g => g.Game.ActiveMods) ?? new Dictionary<string, string>();
         string activeModsString = string.Join(", ", mods.Select(e => $"{e.Key} v{e.Value}"));
 
         if (!mods.TryGetValue("base", out string? baseVersion))

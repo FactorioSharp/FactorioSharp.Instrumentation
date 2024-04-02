@@ -10,13 +10,26 @@ static class FactorioGameInstruments
         Dictionary<string, object?> tags = new();
         data.Server.EnrichTags(tags);
 
+        foreach (string? surface in options.MeasuredSurfaces)
+        {
+            SetupSurfaceInstruments(meter, data.Game, surface, tags, options);
+        }
+
         foreach (string force in options.MeasuredForces)
         {
             SetupForceInstruments(meter, data.Game, force, tags, options);
         }
     }
 
-    static void SetupForceInstruments(Meter meter, FactorioGameData gameData, string force, Dictionary<string, object?> tags, FactorioMeterOptionsInternal options)
+    static void SetupSurfaceInstruments(Meter meter, FactorioGameData gameData, string surface, IDictionary<string, object?> baseTags, FactorioMeterOptionsInternal options)
+    {
+        foreach (MineableResource resource in gameData.MineableResources)
+        {
+            SetupMineableResourceInstruments(meter, gameData, surface, resource, baseTags);
+        }
+    }
+
+    static void SetupForceInstruments(Meter meter, FactorioGameData gameData, string force, IDictionary<string, object?> tags, FactorioMeterOptionsInternal options)
     {
         foreach (string item in options.MeasuredItems)
         {
@@ -29,7 +42,21 @@ static class FactorioGameInstruments
         }
     }
 
-    static void SetupItemInstruments(Meter meter, FactorioGameData gameData, string force, string item, Dictionary<string, object?> baseTags)
+    static void SetupMineableResourceInstruments(Meter meter, FactorioGameData gameData, string surface, MineableResource resource, IDictionary<string, object?> baseTags)
+    {
+        Dictionary<string, object?> tags = new(baseTags)
+            { { "factorio.prototype.kind", "entity" }, { "factorio.resource.category", resource.Category }, { "factorio.resource.mineable", true } };
+
+        meter.CreateObservableUpDownCounter(
+            $"factorio.game.{surface}.resource.{resource.Name}",
+            () => (long)(gameData.Surfaces.GetValueOrDefault(surface)?.Resources.GetValueOrDefault(resource.Name) ?? default),
+            "{resource}",
+            $"The number of {resource} that has been discovered on the map",
+            tags
+        );
+    }
+
+    static void SetupItemInstruments(Meter meter, FactorioGameData gameData, string force, string item, IDictionary<string, object?> baseTags)
     {
         Dictionary<string, object?> tags = new(baseTags) { { "factorio.prototype.kind", "item" } };
 
@@ -50,7 +77,7 @@ static class FactorioGameInstruments
         );
     }
 
-    static void SetupFluidInstruments(Meter meter, FactorioGameData gameData, string force, string fluid, Dictionary<string, object?> baseTags)
+    static void SetupFluidInstruments(Meter meter, FactorioGameData gameData, string force, string fluid, IDictionary<string, object?> baseTags)
     {
         Dictionary<string, object?> tags = new(baseTags) { { "factorio.prototype.kind", "fluid" } };
 

@@ -4,13 +4,13 @@ using FactorioSharp.Instrumentation.Scheduling;
 using FactorioSharp.Rcon;
 using Microsoft.Extensions.Logging;
 
-namespace FactorioSharp.Instrumentation.Integration.Jobs;
+namespace FactorioSharp.Instrumentation.Integration.Jobs.Server;
 
-class UpdateFactorioServerStatus : Job
+class UpdateServerStatusJob : Job
 {
-    readonly ILogger<UpdateFactorioServerStatus> _logger;
+    readonly ILogger<UpdateServerStatusJob> _logger;
 
-    public UpdateFactorioServerStatus(ILogger<UpdateFactorioServerStatus> logger)
+    public UpdateServerStatusJob(ILogger<UpdateServerStatusJob> logger)
     {
         _logger = logger;
     }

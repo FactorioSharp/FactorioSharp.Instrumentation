@@ -24,7 +24,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="FactorioSharp.Rcon" Version="0.3.10" />
+      <PackageReference Include="FactorioSharp.Rcon" Version="0.3.13" />
       <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
       <PackageReference Include="MinVer" Version="5.0.0">
         <PrivateAssets>all</PrivateAssets>
