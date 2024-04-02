@@ -16,15 +16,6 @@ jobs:
       with:
         fetch-depth: 0
         filter: tree:0
-      
-    - name: Append version
-      uses: "DamianReeves/write-file-action@master"
-      with:
-        path: dotnet-releaser.toml
-        write-mode: append
-        contents: |
-            [msbuild.properties]
-            VersionPrefix = "${{ github.ref_name }}"
 
     - name: Install .NET 8.0
       uses: actions/setup-dotnet@v4
