@@ -31,6 +31,33 @@ class UpdateServerModsJob : Job
         }
 
         data.Server.FactorioVersion = baseVersion;
-        data.Server.Mods = mods;
+
+        UpdateMods(mods, data);
+    }
+
+    void UpdateMods(Dictionary<string, string> mods, FactorioData data)
+    {
+        string[] toDisable = data.Game.Mods.Keys.Except(mods.Keys).ToArray();
+        string[] toAdd = mods.Keys.Except(data.Game.Mods.Keys).ToArray();
+
+        foreach (string mod in toDisable)
+        {
+            data.Game.Mods[mod].IsActive = false;
+        }
+
+        foreach (string mod in toAdd)
+        {
+            data.Game.Mods.AddOrUpdate(
+                mod,
+                m => new FactorioModData { IsActive = true, Version = mods[m] },
+                (m, d) =>
+                {
+                    d.IsActive = true;
+                    d.Version = mods[m];
+
+                    return d;
+                }
+            );
+        }
     }
 }

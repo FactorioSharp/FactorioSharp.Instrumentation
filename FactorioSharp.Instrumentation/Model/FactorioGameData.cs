@@ -12,6 +12,8 @@ class FactorioGameData
 
     public MineableResource[] MineableResources { get; set; } = Array.Empty<MineableResource>();
 
+    public ConcurrentDictionary<string, FactorioPlayerData> Players { get; } = new();
+    public ConcurrentDictionary<string, FactorioModData> Mods { get; } = new();
     public ConcurrentDictionary<string, FactorioSurfaceData> Surfaces { get; } = new();
     public ConcurrentDictionary<string, FactorioForceData> Forces { get; } = new();
 }

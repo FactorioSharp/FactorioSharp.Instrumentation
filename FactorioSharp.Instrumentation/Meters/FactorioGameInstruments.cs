@@ -46,6 +46,15 @@ static class FactorioGameInstruments
 
     static void SetupGameInstruments(Meter meter, FactorioGameData gameData, Dictionary<string, object?> tags, FactorioMeterOptionsInternal options)
     {
+        meter.CreateObservableUpDownCounter("factorio.server.player.count", () => gameData.Players.Count, null, "The number of players on the factorio server", tags);
+        meter.CreateObservableUpDownCounter(
+            "factorio.server.connected_player.count",
+            () => gameData.Players.Count(kv => kv.Value.IsOnline),
+            null,
+            "The number of players currently connected to the factorio server",
+            tags
+        );
+
         meter.CreateObservableCounter("factorio.game.tick", () => (long)gameData.Time.Tick, "{tick}", "The current map tick", tags);
         meter.CreateObservableCounter("factorio.game.tick_played", () => (long)gameData.Time.TicksPlayed, "{tick}", "The number of ticks since the game was created", tags);
         meter.CreateObservableGauge("factorio.game.speed", () => gameData.Time.Speed, "{tick}", "The speed to update the map at", tags);

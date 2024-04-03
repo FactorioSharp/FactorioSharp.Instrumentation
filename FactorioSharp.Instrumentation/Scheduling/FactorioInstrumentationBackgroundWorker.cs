@@ -100,6 +100,8 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
                     }
 
                     FactorioGameInstruments.Setup(_meter, _data, _options);
+
+                    _logger.LogInformation("Initialization done.");
                 }
 
                 await _jobs.ExecuteOnTickAsync(_data, result.Client!, _options, stoppingToken);
