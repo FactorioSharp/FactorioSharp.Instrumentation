@@ -7,7 +7,7 @@ using FactorioSharp.Rcon.Model.Builtins;
 using FactorioSharp.Rcon.Model.Classes;
 using Microsoft.Extensions.Logging;
 
-namespace FactorioSharp.Instrumentation.Integration.Jobs;
+namespace FactorioSharp.Instrumentation.Integration.Jobs.Game;
 
 class UpdateForcesJob : Job
 {

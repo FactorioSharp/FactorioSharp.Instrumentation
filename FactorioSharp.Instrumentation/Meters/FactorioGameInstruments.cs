@@ -10,6 +10,8 @@ static class FactorioGameInstruments
         Dictionary<string, object?> tags = new();
         data.Server.EnrichTags(tags);
 
+        SetupGameInstruments(meter, data.Game, tags, options);
+
         foreach (string? surface in options.MeasuredSurfaces)
         {
             SetupSurfaceInstruments(meter, data.Game, surface, tags, options);
@@ -40,6 +42,14 @@ static class FactorioGameInstruments
         {
             SetupFluidInstruments(meter, gameData, force, fluid, tags);
         }
+    }
+
+    static void SetupGameInstruments(Meter meter, FactorioGameData gameData, Dictionary<string, object?> tags, FactorioMeterOptionsInternal options)
+    {
+        meter.CreateObservableCounter("factorio.game.tick", () => (long)gameData.Time.Tick, "{tick}", "The current map tick", tags);
+        meter.CreateObservableCounter("factorio.game.tick_played", () => (long)gameData.Time.TicksPlayed, "{tick}", "The number of ticks since the game was created", tags);
+        meter.CreateObservableGauge("factorio.game.speed", () => gameData.Time.Speed, "{tick}", "The speed to update the map at", tags);
+        meter.CreateObservableUpDownCounter("factorio.game.paused", () => gameData.Time.Paused ? 1 : 0, "{tick}", "Is the game paused ?", tags);
     }
 
     static void SetupMineableResourceInstruments(Meter meter, FactorioGameData gameData, string surface, MineableResource resource, IDictionary<string, object?> baseTags)

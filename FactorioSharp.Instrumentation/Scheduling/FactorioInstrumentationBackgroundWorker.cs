@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.Metrics;
 using FactorioSharp.Instrumentation.Integration;
-using FactorioSharp.Instrumentation.Integration.Jobs;
+using FactorioSharp.Instrumentation.Integration.Jobs.Game;
 using FactorioSharp.Instrumentation.Integration.Jobs.Production;
 using FactorioSharp.Instrumentation.Integration.Jobs.Server;
 using FactorioSharp.Instrumentation.Meters;
@@ -46,6 +46,7 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
             new UpdateServerStatusJob(loggerFactory.CreateLogger<UpdateServerStatusJob>()),
             new UpdateServerModsJob(loggerFactory.CreateLogger<UpdateServerModsJob>()),
             new UpdateServerPlayersJob(loggerFactory.CreateLogger<UpdateServerPlayersJob>()),
+            new UpdateGameJob(loggerFactory.CreateLogger<UpdateGameJob>()),
             new UpdateSurfacesJob(loggerFactory.CreateLogger<UpdateSurfacesJob>()),
             new UpdateForcesJob(loggerFactory.CreateLogger<UpdateForcesJob>()),
             new UpdateItemsJob(loggerFactory.CreateLogger<UpdateItemsJob>()),

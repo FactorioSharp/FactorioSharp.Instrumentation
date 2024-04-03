@@ -10,7 +10,7 @@ class FactorioServerInstruments
         Dictionary<string, object?> tags = new();
         data.EnrichTags(tags);
 
-        meter.CreateObservableUpDownCounter("factorio.server.status", () => data.IsConnected ? 1 : 0, null, "The current status of the factorio server", tags);
+        meter.CreateObservableUpDownCounter("factorio.server.status", () => data.IsConnected ? 1 : 0, null, "Is the factorio server up ?", tags);
         meter.CreateObservableUpDownCounter("factorio.server.player.count", () => data.Players.Length, null, "The number of players on the factorio server", tags);
         meter.CreateObservableUpDownCounter(
             "factorio.server.connected_player.count",
