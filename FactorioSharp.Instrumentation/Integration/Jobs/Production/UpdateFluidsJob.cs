@@ -48,7 +48,7 @@ class UpdateFluidsJob : Job
                                                                        ?? new Dictionary<string, Union1104138130>();
             foreach (KeyValuePair<string, Union1104138130> entry in fluidInputStatistics)
             {
-                flowData.Inputs[entry.Key] = entry.Value.AsT1;
+                flowData.Inputs[entry.Key] = entry.Value.Match(l => l, d => d);
             }
 
             if (cancellationToken.IsCancellationRequested)
@@ -60,7 +60,7 @@ class UpdateFluidsJob : Job
                                                                         ?? new Dictionary<string, Union1104138130>();
             foreach (KeyValuePair<string, Union1104138130> entry in fluidOutputStatistics)
             {
-                flowData.Outputs[entry.Key] = entry.Value.AsT1;
+                flowData.Outputs[entry.Key] = entry.Value.Match(l => l, d => d);
             }
         }
     }
