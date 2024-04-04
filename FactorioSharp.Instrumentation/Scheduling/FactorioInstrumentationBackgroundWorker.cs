@@ -100,7 +100,7 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
                         FactorioServerInstruments.Setup(_meter, _data.Server, _options);
                     }
 
-                    FactorioGameInstruments.Setup(_meter, _data, _options);
+                    FactorioGameInstruments.Setup(_meter, _data);
 
                     _logger.LogInformation("Initialization done.");
                 }

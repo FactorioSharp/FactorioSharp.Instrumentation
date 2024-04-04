@@ -5,35 +5,19 @@ namespace FactorioSharp.Instrumentation.Meters;
 
 static class FactorioGameInstruments
 {
-    public static void Setup(Meter meter, FactorioData data, FactorioMeterOptionsInternal options)
+    public static void Setup(Meter meter, FactorioData data)
     {
         Dictionary<string, object?> tags = new();
         data.Server.EnrichTags(tags);
 
-        SetupGameInstruments(meter, data.Game, tags, options);
+        SetupGameInstruments(meter, data.Game, tags);
         SetupMineableResourceInstruments(meter, data.Game, tags);
         SetupElectricNetworkInstruments(meter, data.Game, tags);
-
-        foreach (string force in options.MeasuredForces)
-        {
-            SetupForceInstruments(meter, data.Game, force, tags, options);
-        }
+        SetupItemInstruments(meter, data.Game, tags);
+        SetupFluidInstruments(meter, data.Game, tags);
     }
 
-    static void SetupForceInstruments(Meter meter, FactorioGameData gameData, string force, IDictionary<string, object?> tags, FactorioMeterOptionsInternal options)
-    {
-        foreach (string item in options.MeasuredItems)
-        {
-            SetupItemInstruments(meter, gameData, force, item, tags);
-        }
-
-        foreach (string fluid in options.MeasuredFluids)
-        {
-            SetupFluidInstruments(meter, gameData, force, fluid, tags);
-        }
-    }
-
-    static void SetupGameInstruments(Meter meter, FactorioGameData gameData, Dictionary<string, object?> tags, FactorioMeterOptionsInternal options)
+    static void SetupGameInstruments(Meter meter, FactorioGameData gameData, Dictionary<string, object?> tags)
     {
         meter.CreateObservableUpDownCounter("factorio.server.player.count", () => gameData.Players.Count, null, "The number of players on the factorio server", tags);
         meter.CreateObservableUpDownCounter(
@@ -77,45 +61,89 @@ static class FactorioGameInstruments
             "The number of mineable resources that has been discovered on the map"
         );
 
-    static void SetupItemInstruments(Meter meter, FactorioGameData gameData, string force, string item, IDictionary<string, object?> baseTags)
+    static void SetupItemInstruments(Meter meter, FactorioGameData gameData, IDictionary<string, object?> baseTags)
     {
-        Dictionary<string, object?> tags = new(baseTags) { { "factorio.prototype.kind", "item" } };
-
         meter.CreateObservableCounter(
-            $"factorio.game.{force}.production.{item}.input",
-            () => (long)(gameData.Forces.GetValueOrDefault(force)?.Production.Item.Inputs.GetValueOrDefault(item) ?? default),
+            "factorio.game.item.input",
+            () => gameData.Forces.SelectMany(
+                forceKv => forceKv.Value.Production.Item.Inputs.Select(
+                    itemKv => new Measurement<long>(
+                        (long)itemKv.Value,
+                        baseTags.Concat(
+                            new Dictionary<string, object?>
+                            {
+                                { "factorio.force", forceKv.Key },
+                                { "factorio.item", itemKv.Key }
+                            }
+                        )
+                    )
+                )
+            ),
             "{item}",
-            $"The number of {item} that has been produced by force {force}",
-            tags
+            "The number of items produced"
         );
 
         meter.CreateObservableCounter(
-            $"factorio.game.{force}.production.{item}.output",
-            () => (long)(gameData.Forces.GetValueOrDefault(force)?.Production.Item.Outputs.GetValueOrDefault(item) ?? default),
+            "factorio.game.item.output",
+            () => gameData.Forces.SelectMany(
+                forceKv => forceKv.Value.Production.Item.Outputs.Select(
+                    itemKv => new Measurement<long>(
+                        (long)itemKv.Value,
+                        baseTags.Concat(
+                            new Dictionary<string, object?>
+                            {
+                                { "factorio.force", forceKv.Key },
+                                { "factorio.item", itemKv.Key }
+                            }
+                        )
+                    )
+                )
+            ),
             "{item}",
-            $"The number of {item} that has been consumed by force {force}",
-            tags
+            "The number of items consumed"
         );
     }
 
-    static void SetupFluidInstruments(Meter meter, FactorioGameData gameData, string force, string fluid, IDictionary<string, object?> baseTags)
+    static void SetupFluidInstruments(Meter meter, FactorioGameData gameData, IDictionary<string, object?> baseTags)
     {
-        Dictionary<string, object?> tags = new(baseTags) { { "factorio.prototype.kind", "fluid" } };
-
         meter.CreateObservableCounter(
-            $"factorio.game.{force}.production.{fluid}.input",
-            () => gameData.Forces.GetValueOrDefault(force)?.Production.Fluid.Inputs.GetValueOrDefault(fluid) ?? default,
-            "{volume}",
-            $"The quantity of {fluid} that has been produced by force {force}",
-            tags
+            "factorio.game.fluid.input",
+            () => gameData.Forces.SelectMany(
+                forceKv => forceKv.Value.Production.Fluid.Inputs.Select(
+                    itemKv => new Measurement<double>(
+                        itemKv.Value,
+                        baseTags.Concat(
+                            new Dictionary<string, object?>
+                            {
+                                { "factorio.force", forceKv.Key },
+                                { "factorio.fluid", itemKv.Key }
+                            }
+                        )
+                    )
+                )
+            ),
+            "{fluid}",
+            "The amount of fluids produced"
         );
 
         meter.CreateObservableCounter(
-            $"factorio.game.{force}.production.{fluid}.output",
-            () => gameData.Forces.GetValueOrDefault(force)?.Production.Fluid.Outputs.GetValueOrDefault(fluid) ?? default,
-            "{volume}",
-            $"The quantity of {fluid} that has been consumed by force {force}",
-            tags
+            "factorio.game.fluid.output",
+            () => gameData.Forces.SelectMany(
+                forceKv => forceKv.Value.Production.Fluid.Outputs.Select(
+                    itemKv => new Measurement<double>(
+                        itemKv.Value,
+                        baseTags.Concat(
+                            new Dictionary<string, object?>
+                            {
+                                { "factorio.force", forceKv.Key },
+                                { "factorio.fluid", itemKv.Key }
+                            }
+                        )
+                    )
+                )
+            ),
+            "{item}",
+            "The amount of fluids consumed"
         );
     }
 
