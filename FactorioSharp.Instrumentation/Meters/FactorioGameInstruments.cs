@@ -142,7 +142,7 @@ static class FactorioGameInstruments
                     )
                 )
             ),
-            "{item}",
+            "{fluid}",
             "The amount of fluids consumed"
         );
     }
