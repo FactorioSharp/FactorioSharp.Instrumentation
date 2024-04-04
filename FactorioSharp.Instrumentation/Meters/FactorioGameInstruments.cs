@@ -11,6 +11,7 @@ static class FactorioGameInstruments
         data.Server.EnrichTags(tags);
 
         SetupGameInstruments(meter, data.Game, tags, options);
+        SetupElectricNetworkInstruments(meter, data.Game, tags);
 
         foreach (string? surface in options.MeasuredSurfaces)
         {
@@ -29,8 +30,6 @@ static class FactorioGameInstruments
         {
             SetupMineableResourceInstruments(meter, gameData, surface, resource, baseTags);
         }
-
-        SetupElectricNetworkInstruments(meter, gameData, surface, baseTags);
     }
 
     static void SetupForceInstruments(Meter meter, FactorioGameData gameData, string force, IDictionary<string, object?> tags, FactorioMeterOptionsInternal options)
@@ -119,55 +118,96 @@ static class FactorioGameInstruments
         );
     }
 
-    static void SetupElectricNetworkInstruments(Meter meter, FactorioGameData gameData, string surface, IDictionary<string, object?> baseTags)
+    static void SetupElectricNetworkInstruments(Meter meter, FactorioGameData gameData, IDictionary<string, object?> baseTags)
     {
-        foreach (ElectricEntity electricEntity in gameData.ElectricEntities)
-        {
-            Dictionary<string, object?> tags = new(baseTags);
-            ElectricEntityType type = electricEntity.Type;
+        meter.CreateObservableUpDownCounter(
+            "factorio.game.energy.input",
+            () => gameData.Surfaces.SelectMany(
+                surfaceKv => surfaceKv.Value.ElectricNetworks.SelectMany(
+                    networkKv => networkKv.Value.Flow.Inputs.Select(
+                        entityKv =>
+                        {
+                            ElectricEntity entity = gameData.ElectricEntities[entityKv.Key];
+                            return new Measurement<double>(
+                                entityKv.Value,
+                                baseTags.Concat(
+                                    new Dictionary<string, object?>
+                                    {
+                                        { "factorio.surface", surfaceKv.Key },
+                                        { "factorio.network", networkKv.Key },
+                                        { "factorio.entity", entityKv.Key },
+                                        { "factorio.energy.max_usage", entity.MaxEnergyUsage },
+                                        { "factorio.energy.max_production", entity.MaxEnergyProduction },
+                                        { "factorio.energy.buffer_capacity", entity.BufferCapacity }
+                                    }
+                                )
+                            );
+                        }
+                    )
+                )
+            ),
+            "W",
+            "The current power being produced"
+        );
 
-            tags["energy.max_usage"] = electricEntity.MaxEnergyUsage;
-            tags["energy.max_production"] = electricEntity.MaxEnergyProduction;
-            tags["energy.buffer_capacity"] = electricEntity.BufferCapacity;
+        meter.CreateObservableUpDownCounter(
+            "factorio.game.energy.output",
+            () => gameData.Surfaces.SelectMany(
+                surfaceKv => surfaceKv.Value.ElectricNetworks.SelectMany(
+                    networkKv => networkKv.Value.Flow.Outputs.Select(
+                        entityKv =>
+                        {
+                            ElectricEntity entity = gameData.ElectricEntities[entityKv.Key];
+                            return new Measurement<double>(
+                                entityKv.Value,
+                                baseTags.Concat(
+                                    new Dictionary<string, object?>
+                                    {
+                                        { "factorio.surface", surfaceKv.Key },
+                                        { "factorio.network", networkKv.Key },
+                                        { "factorio.entity", entityKv.Key },
+                                        { "factorio.energy.max_usage", entity.MaxEnergyUsage },
+                                        { "factorio.energy.max_production", entity.MaxEnergyProduction },
+                                        { "factorio.energy.buffer_capacity", entity.BufferCapacity }
+                                    }
+                                )
+                            );
+                        }
+                    )
+                )
+            ),
+            "W",
+            "The current power being produced"
+        );
 
-            if (type.HasFlag(ElectricEntityType.Sink))
-            {
-                tags["energy.is_sink"] = true;
-            }
-
-            if (type.HasFlag(ElectricEntityType.Source))
-            {
-                tags["energy.is_source"] = true;
-            }
-
-            if (type.HasFlag(ElectricEntityType.Accumulator))
-            {
-                tags["energy.is_accumulator"] = true;
-            }
-
-            meter.CreateObservableUpDownCounter(
-                $"factorio.game.{surface}.{electricEntity.Name}.input",
-                () => gameData.Surfaces.GetValueOrDefault(surface)?.ElectricNetworks.Sum(kv => kv.Value.Flow.Inputs.GetValueOrDefault(electricEntity.Name)) ?? default,
-                "W",
-                $"The current power produced by all {electricEntity.Name} on surface {surface}",
-                tags
-            );
-
-            meter.CreateObservableUpDownCounter(
-                $"factorio.game.{surface}.{electricEntity.Name}.output",
-                () => gameData.Surfaces.GetValueOrDefault(surface)?.ElectricNetworks.Sum(kv => kv.Value.Flow.Outputs.GetValueOrDefault(electricEntity.Name)) ?? default,
-                "W",
-                $"The current power produced by all {electricEntity.Name} on surface {surface}",
-                tags
-            );
-
-            meter.CreateObservableUpDownCounter(
-                $"factorio.game.{surface}.{electricEntity.Name}.buffer",
-                () => gameData.Surfaces.GetValueOrDefault(surface)?.ElectricNetworks.Sum(kv => kv.Value.Buffer.GetValueOrDefault(electricEntity.Name)) ?? default,
-                "J",
-                $"The current power stored in all {electricEntity.Name} on surface {surface}",
-                tags
-            );
-        }
+        meter.CreateObservableUpDownCounter(
+            "factorio.game.energy.buffer",
+            () => gameData.Surfaces.SelectMany(
+                surfaceKv => surfaceKv.Value.ElectricNetworks.SelectMany(
+                    networkKv => networkKv.Value.Buffer.Select(
+                        entityKv =>
+                        {
+                            ElectricEntity entity = gameData.ElectricEntities[entityKv.Key];
+                            return new Measurement<double>(
+                                entityKv.Value,
+                                baseTags.Concat(
+                                    new Dictionary<string, object?>
+                                    {
+                                        { "factorio.surface", surfaceKv.Key },
+                                        { "factorio.network", networkKv.Key },
+                                        { "factorio.entity", entityKv.Key },
+                                        { "factorio.energy.max_usage", entity.MaxEnergyUsage },
+                                        { "factorio.energy.max_production", entity.MaxEnergyProduction },
+                                        { "factorio.energy.buffer_capacity", entity.BufferCapacity }
+                                    }
+                                )
+                            );
+                        }
+                    )
+                )
+            ),
+            "W",
+            "The current power being produced"
+        );
     }
 }

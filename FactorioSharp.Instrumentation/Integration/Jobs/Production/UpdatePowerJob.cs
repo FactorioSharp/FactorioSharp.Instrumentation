@@ -19,9 +19,10 @@ class UpdatePowerJob : Job
 
     public override async Task OnConnectAsync(FactorioRconClient client, FactorioData data, FactorioMeterOptionsInternal options, CancellationToken cancellationToken)
     {
-        data.Game.ElectricEntities = await GetElectricEntities(client);
+        ElectricEntity[] entities = await GetElectricEntities(client);
+        data.Game.ElectricEntities = entities.ToDictionary(e => e.Name, e => e);
 
-        _logger.LogInformation("Electric entities: {entities}", string.Join(", ", data.Game.ElectricEntities.Select(e => $"{e.Name} ({e.Type})")));
+        _logger.LogInformation("Electric entities: {entities}", string.Join(", ", entities.Select(e => $"{e.Name} ({e.Type})")));
     }
 
     public override async Task OnTickAsync(FactorioRconClient client, FactorioData data, FactorioMeterOptionsInternal options, CancellationToken cancellationToken)
