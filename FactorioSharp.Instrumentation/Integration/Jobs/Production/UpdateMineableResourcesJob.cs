@@ -1,9 +1,8 @@
-﻿using FactorioSharp.Instrumentation.Meters;
+﻿using System.Text.Json;
+using FactorioSharp.Instrumentation.Meters;
 using FactorioSharp.Instrumentation.Model;
 using FactorioSharp.Instrumentation.Scheduling;
 using FactorioSharp.Rcon;
-using FactorioSharp.Rcon.Model.Builtins;
-using FactorioSharp.Rcon.Model.Classes;
 using Microsoft.Extensions.Logging;
 
 namespace FactorioSharp.Instrumentation.Integration.Jobs.Production;
@@ -11,6 +10,7 @@ namespace FactorioSharp.Instrumentation.Integration.Jobs.Production;
 class UpdateMineableResourcesJob : Job
 {
     readonly ILogger<UpdateMineableResourcesJob> _logger;
+    static readonly JsonSerializerOptions JsonSerializerOptions = new() { PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower };
 
     public UpdateMineableResourcesJob(ILogger<UpdateMineableResourcesJob> logger)
     {
@@ -19,32 +19,9 @@ class UpdateMineableResourcesJob : Job
 
     public override async Task OnConnectAsync(FactorioRconClient client, FactorioData data, FactorioMeterOptionsInternal options, CancellationToken cancellationToken)
     {
-        LuaCustomTable<string, LuaEntityPrototype>? entitiesTable = await client.ReadAsync(g => g.Game.EntityPrototypes);
-        IEnumerable<string> entities = entitiesTable?.Keys ?? [];
+        data.Game.MineableResources = await GetMineableResources(client);
 
-        List<MineableResource> mineableResources = [];
-
-        foreach (string entity in entities)
-        {
-            string? type = await client.ReadAsync((g, e) => g.Game.EntityPrototypes[e].Type, entity);
-            if (type != "resource")
-            {
-                continue;
-            }
-
-            bool isMineable = await client.ReadAsync((g, e) => g.Game.EntityPrototypes[e].MineableProperties.Minable, entity);
-            if (!isMineable)
-            {
-                continue;
-            }
-
-            string? category = await client.ReadAsync((g, e) => g.Game.EntityPrototypes[e].ResourceCategory, entity);
-            mineableResources.Add(new MineableResource(entity, category));
-        }
-
-        data.Game.MineableResources = mineableResources.ToArray();
-
-        _logger.LogInformation("Mineable resources: {resources}", string.Join(", ", mineableResources.Select(r => $"{r.Name} ({r.Category})")));
+        _logger.LogInformation("Mineable resources: {resources}", string.Join(", ", data.Game.MineableResources.Select(r => $"{r.Name} ({r.Category})")));
     }
 
     public override async Task OnTickAsync(FactorioRconClient client, FactorioData data, FactorioMeterOptionsInternal options, CancellationToken cancellationToken)
@@ -65,5 +42,24 @@ class UpdateMineableResourcesJob : Job
 
             surfaceData.Resources = resources;
         }
+    }
+
+    static async Task<MineableResource[]> GetMineableResources(FactorioRconClient client)
+    {
+        string result = await client.LowLevelClient.ExecuteAsync(
+            """
+            local result = {}
+
+            for k, v in pairs(game.entity_prototypes) do
+                if v.type == "resource" and v.mineable_properties.minable then
+                    table.insert(result, { name = v.name, category = v.resource_category })
+                end
+            end
+
+            rcon.print(game.table_to_json(result));
+            """
+        );
+
+        return JsonSerializer.Deserialize<MineableResource[]>(result, JsonSerializerOptions) ?? Array.Empty<MineableResource>();
     }
 }

@@ -11,6 +11,7 @@ class FactorioGameData
     public FactorioGameTimeData Time { get; } = new();
 
     public MineableResource[] MineableResources { get; set; } = Array.Empty<MineableResource>();
+    public Dictionary<string, ElectricEntity> ElectricEntities { get; set; } = new();
 
     public ConcurrentDictionary<string, FactorioPlayerData> Players { get; } = new();
     public ConcurrentDictionary<string, FactorioModData> Mods { get; } = new();

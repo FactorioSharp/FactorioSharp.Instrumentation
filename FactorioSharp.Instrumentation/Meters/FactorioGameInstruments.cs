@@ -11,6 +11,7 @@ static class FactorioGameInstruments
         data.Server.EnrichTags(tags);
 
         SetupGameInstruments(meter, data.Game, tags, options);
+        SetupElectricNetworkInstruments(meter, data.Game, tags);
 
         foreach (string? surface in options.MeasuredSurfaces)
         {
@@ -114,6 +115,99 @@ static class FactorioGameInstruments
             "{volume}",
             $"The quantity of {fluid} that has been consumed by force {force}",
             tags
+        );
+    }
+
+    static void SetupElectricNetworkInstruments(Meter meter, FactorioGameData gameData, IDictionary<string, object?> baseTags)
+    {
+        meter.CreateObservableUpDownCounter(
+            "factorio.game.energy.input",
+            () => gameData.Surfaces.SelectMany(
+                surfaceKv => surfaceKv.Value.ElectricNetworks.SelectMany(
+                    networkKv => networkKv.Value.Flow.Inputs.Select(
+                        entityKv =>
+                        {
+                            ElectricEntity entity = gameData.ElectricEntities[entityKv.Key];
+                            return new Measurement<double>(
+                                entityKv.Value,
+                                baseTags.Concat(
+                                    new Dictionary<string, object?>
+                                    {
+                                        { "factorio.surface", surfaceKv.Key },
+                                        { "factorio.network", networkKv.Key },
+                                        { "factorio.entity", entityKv.Key },
+                                        { "factorio.energy.max_usage", entity.MaxEnergyUsage },
+                                        { "factorio.energy.max_production", entity.MaxEnergyProduction },
+                                        { "factorio.energy.buffer_capacity", entity.BufferCapacity }
+                                    }
+                                )
+                            );
+                        }
+                    )
+                )
+            ),
+            "W",
+            "The current power being produced"
+        );
+
+        meter.CreateObservableUpDownCounter(
+            "factorio.game.energy.output",
+            () => gameData.Surfaces.SelectMany(
+                surfaceKv => surfaceKv.Value.ElectricNetworks.SelectMany(
+                    networkKv => networkKv.Value.Flow.Outputs.Select(
+                        entityKv =>
+                        {
+                            ElectricEntity entity = gameData.ElectricEntities[entityKv.Key];
+                            return new Measurement<double>(
+                                entityKv.Value,
+                                baseTags.Concat(
+                                    new Dictionary<string, object?>
+                                    {
+                                        { "factorio.surface", surfaceKv.Key },
+                                        { "factorio.network", networkKv.Key },
+                                        { "factorio.entity", entityKv.Key },
+                                        { "factorio.energy.max_usage", entity.MaxEnergyUsage },
+                                        { "factorio.energy.max_production", entity.MaxEnergyProduction },
+                                        { "factorio.energy.buffer_capacity", entity.BufferCapacity }
+                                    }
+                                )
+                            );
+                        }
+                    )
+                )
+            ),
+            "W",
+            "The current power being produced"
+        );
+
+        meter.CreateObservableUpDownCounter(
+            "factorio.game.energy.buffer",
+            () => gameData.Surfaces.SelectMany(
+                surfaceKv => surfaceKv.Value.ElectricNetworks.SelectMany(
+                    networkKv => networkKv.Value.Buffer.Select(
+                        entityKv =>
+                        {
+                            ElectricEntity entity = gameData.ElectricEntities[entityKv.Key];
+                            return new Measurement<double>(
+                                entityKv.Value,
+                                baseTags.Concat(
+                                    new Dictionary<string, object?>
+                                    {
+                                        { "factorio.surface", surfaceKv.Key },
+                                        { "factorio.network", networkKv.Key },
+                                        { "factorio.entity", entityKv.Key },
+                                        { "factorio.energy.max_usage", entity.MaxEnergyUsage },
+                                        { "factorio.energy.max_production", entity.MaxEnergyProduction },
+                                        { "factorio.energy.buffer_capacity", entity.BufferCapacity }
+                                    }
+                                )
+                            );
+                        }
+                    )
+                )
+            ),
+            "W",
+            "The current power being produced"
         );
     }
 }
