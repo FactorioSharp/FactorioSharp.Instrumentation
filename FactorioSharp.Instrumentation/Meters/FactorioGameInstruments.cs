@@ -11,24 +11,12 @@ static class FactorioGameInstruments
         data.Server.EnrichTags(tags);
 
         SetupGameInstruments(meter, data.Game, tags, options);
+        SetupMineableResourceInstruments(meter, data.Game, tags);
         SetupElectricNetworkInstruments(meter, data.Game, tags);
-
-        foreach (string? surface in options.MeasuredSurfaces)
-        {
-            SetupSurfaceInstruments(meter, data.Game, surface, tags, options);
-        }
 
         foreach (string force in options.MeasuredForces)
         {
             SetupForceInstruments(meter, data.Game, force, tags, options);
-        }
-    }
-
-    static void SetupSurfaceInstruments(Meter meter, FactorioGameData gameData, string surface, IDictionary<string, object?> baseTags, FactorioMeterOptionsInternal options)
-    {
-        foreach (MineableResource resource in gameData.MineableResources)
-        {
-            SetupMineableResourceInstruments(meter, gameData, surface, resource, baseTags);
         }
     }
 
@@ -62,19 +50,32 @@ static class FactorioGameInstruments
         meter.CreateObservableUpDownCounter("factorio.game.paused", () => gameData.Time.Paused ? 1 : 0, "{tick}", "Is the game paused ?", tags);
     }
 
-    static void SetupMineableResourceInstruments(Meter meter, FactorioGameData gameData, string surface, MineableResource resource, IDictionary<string, object?> baseTags)
-    {
-        Dictionary<string, object?> tags = new(baseTags)
-            { { "factorio.prototype.kind", "entity" }, { "factorio.resource.category", resource.Category }, { "factorio.resource.mineable", true } };
-
+    static void SetupMineableResourceInstruments(Meter meter, FactorioGameData gameData, IDictionary<string, object?> baseTags) =>
         meter.CreateObservableUpDownCounter(
-            $"factorio.game.{surface}.resource.{resource.Name}",
-            () => (long)(gameData.Surfaces.GetValueOrDefault(surface)?.Resources.GetValueOrDefault(resource.Name) ?? default),
+            "factorio.game.mineable_resource",
+            () => gameData.Surfaces.SelectMany(
+                surfaceKv => surfaceKv.Value.Resources.Select(
+                    resourceKv =>
+                    {
+                        MineableResource resource = gameData.MineableResources[resourceKv.Key];
+                        return new Measurement<long>(
+                            resourceKv.Value,
+                            baseTags.Concat(
+                                new Dictionary<string, object?>
+                                {
+                                    { "factorio.surface", surfaceKv.Key },
+                                    { "factorio.entity", resourceKv.Key },
+                                    { "factorio.resource.mineable", true },
+                                    { "factorio.resource.category", resource.Category }
+                                }
+                            )
+                        );
+                    }
+                )
+            ),
             "{resource}",
-            $"The number of {resource} that has been discovered on the map",
-            tags
+            "The number of mineable resources that has been discovered on the map"
         );
-    }
 
     static void SetupItemInstruments(Meter meter, FactorioGameData gameData, string force, string item, IDictionary<string, object?> baseTags)
     {
