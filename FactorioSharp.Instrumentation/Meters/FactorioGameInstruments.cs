@@ -29,6 +29,8 @@ static class FactorioGameInstruments
         {
             SetupMineableResourceInstruments(meter, gameData, surface, resource, baseTags);
         }
+
+        SetupElectricNetworkInstruments(meter, gameData, surface, baseTags);
     }
 
     static void SetupForceInstruments(Meter meter, FactorioGameData gameData, string force, IDictionary<string, object?> tags, FactorioMeterOptionsInternal options)
@@ -115,5 +117,57 @@ static class FactorioGameInstruments
             $"The quantity of {fluid} that has been consumed by force {force}",
             tags
         );
+    }
+
+    static void SetupElectricNetworkInstruments(Meter meter, FactorioGameData gameData, string surface, IDictionary<string, object?> baseTags)
+    {
+        foreach (ElectricEntity electricEntity in gameData.ElectricEntities)
+        {
+            Dictionary<string, object?> tags = new(baseTags);
+            ElectricEntityType type = electricEntity.Type;
+
+            tags["energy.max_usage"] = electricEntity.MaxEnergyUsage;
+            tags["energy.max_production"] = electricEntity.MaxEnergyProduction;
+            tags["energy.buffer_capacity"] = electricEntity.BufferCapacity;
+
+            if (type.HasFlag(ElectricEntityType.Sink))
+            {
+                tags["energy.is_sink"] = true;
+            }
+
+            if (type.HasFlag(ElectricEntityType.Source))
+            {
+                tags["energy.is_source"] = true;
+            }
+
+            if (type.HasFlag(ElectricEntityType.Accumulator))
+            {
+                tags["energy.is_accumulator"] = true;
+            }
+
+            meter.CreateObservableUpDownCounter(
+                $"factorio.game.{surface}.{electricEntity.Name}.input",
+                () => gameData.Surfaces.GetValueOrDefault(surface)?.ElectricNetworks.Sum(kv => kv.Value.Flow.Inputs.GetValueOrDefault(electricEntity.Name)) ?? default,
+                "W",
+                $"The current power produced by all {electricEntity.Name} on surface {surface}",
+                tags
+            );
+
+            meter.CreateObservableUpDownCounter(
+                $"factorio.game.{surface}.{electricEntity.Name}.output",
+                () => gameData.Surfaces.GetValueOrDefault(surface)?.ElectricNetworks.Sum(kv => kv.Value.Flow.Outputs.GetValueOrDefault(electricEntity.Name)) ?? default,
+                "W",
+                $"The current power produced by all {electricEntity.Name} on surface {surface}",
+                tags
+            );
+
+            meter.CreateObservableUpDownCounter(
+                $"factorio.game.{surface}.{electricEntity.Name}.buffer",
+                () => gameData.Surfaces.GetValueOrDefault(surface)?.ElectricNetworks.Sum(kv => kv.Value.Buffer.GetValueOrDefault(electricEntity.Name)) ?? default,
+                "J",
+                $"The current power stored in all {electricEntity.Name} on surface {surface}",
+                tags
+            );
+        }
     }
 }

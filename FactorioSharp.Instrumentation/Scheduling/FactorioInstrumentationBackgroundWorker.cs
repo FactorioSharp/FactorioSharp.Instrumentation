@@ -51,7 +51,8 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
             new UpdateForcesJob(loggerFactory.CreateLogger<UpdateForcesJob>()),
             new UpdateItemsJob(loggerFactory.CreateLogger<UpdateItemsJob>()),
             new UpdateFluidsJob(loggerFactory.CreateLogger<UpdateFluidsJob>()),
-            new UpdateMineableResourcesJob(loggerFactory.CreateLogger<UpdateMineableResourcesJob>())
+            new UpdateMineableResourcesJob(loggerFactory.CreateLogger<UpdateMineableResourcesJob>()),
+            new UpdatePowerJob(loggerFactory.CreateLogger<UpdatePowerJob>())
         };
     }
 

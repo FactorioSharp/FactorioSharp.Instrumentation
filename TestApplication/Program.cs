@@ -18,7 +18,8 @@ builder.Services.AddOpenTelemetry()
                     options.Server.RconPassword = "password";
                 }
             )
-            .AddPrometheusHttpListener(options => options.UriPrefixes = ["http://localhost:9184/"])
+            .AddOtlpExporter(options => options.Endpoint = new Uri("http://localhost:9183/"))
+        //.AddPrometheusHttpListener(options => options.UriPrefixes = ["http://localhost:9184/"])
     );
 
 IHost app = builder.Build();
