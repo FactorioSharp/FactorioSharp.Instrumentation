@@ -45,7 +45,13 @@ HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddOpenTelemetry()
     .WithMetrics(
         metrics => metrics.ConfigureResource(resource => resource.AddService(serviceName, serviceVersion))
-            .AddFactorioInstrumentation("127.0.0.1", "password")
+            .AddFactorioInstrumentation(
+                options =>
+                {
+                    options.Server.Uri = new Uri("http://localhost:27015");
+                    options.Server.RconPassword = "password";
+                }
+            )
             .AddConsoleExporter()
     );
 
@@ -80,7 +86,13 @@ HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddOpenTelemetry()
     .WithMetrics(
         metrics => metrics.ConfigureResource(resource => resource.AddService(serviceName, serviceVersion))
-            .AddFactorioInstrumentation("127.0.0.1", "password")
+            .AddFactorioInstrumentation(
+                options =>
+                {
+                    options.Server.Uri = new Uri("http://localhost:27015");
+                    options.Server.RconPassword = "password";
+                }
+            )
             .AddPrometheusHttpListener(options => options.UriPrefixes = ["http://localhost:9184/"])
     );
 
@@ -112,6 +124,8 @@ Display the `factorio_server_status` signal to make sure that it works as expect
 
 ![Prometheus graph showing the factorio_server_status signal](imgs/prometheus-status-graph.png)
 
-The timeseries exposed by prometheus can then be used to build dashboards, for example using grafana we can display the amount of iron and copper currently available to the player.
+The timeseries exposed by prometheus can then be used to build dashboards.
+
+Example of Grafana dashboard in an early game:
 
 ![Grafana dashboard displaying the amount of iron (ore and plate) and copper (ore and plate) that the player has available](imgs/grafana-dashboard.png)

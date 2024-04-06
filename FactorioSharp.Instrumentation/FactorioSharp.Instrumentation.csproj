@@ -21,9 +21,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="README.md" Pack="true" PackagePath="" />
+        <None Include="../README.md" Pack="true" PackagePath="" />
     </ItemGroup>
-
+    
     <ItemGroup>
       <PackageReference Include="FactorioSharp.Rcon" Version="0.3.15" />
       <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
