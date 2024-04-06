@@ -10,8 +10,8 @@
         <Authors>Ismail Bennani</Authors>
         <NeutralLanguage>en</NeutralLanguage>
         <Copyright>Ismail Bennani</Copyright>
-        <PackageProjectUrl>https://github.com/FactorioSharp/FactorioSharp.Instrumentation/tree/main</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/FactorioSharp/FactorioSharp.Instrumentation/tree/main</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/FactorioSharp/FactorioSharp.Instrumentation</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/FactorioSharp/FactorioSharp.Instrumentation</RepositoryUrl>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -19,7 +19,7 @@
         <PackageTags>factorio, instrumentation, diagnostics, metrics, telemetry</PackageTags>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
-
+ 
     <ItemGroup>
         <None Include="../README.md" Pack="true" PackagePath="" />
     </ItemGroup>

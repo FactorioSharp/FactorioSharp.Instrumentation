@@ -47,7 +47,7 @@ public class FactorioMeasurementOptions
 
     /// <summary>
     ///     Rate at which data must be read from the factorio server.
-    ///     The higher this value, the more intensive the data collection will be on the server.\
+    ///     The higher this value, the more intensive the data collection will be on the server. <br />
     ///     Defaults to 15 seconds.
     /// </summary>
     /// <remarks>
@@ -57,7 +57,7 @@ public class FactorioMeasurementOptions
     public TimeSpan ObservationInterval { get; set; } = TimeSpan.FromSeconds(15);
 
     /// <summary>
-    ///     Interval of time between two connection attempts: when the server is lost, how often should we try to reconnect.\
+    ///     Interval of time between two connection attempts: when the server is lost, how often should we try to reconnect. <br />
     ///     Defaults to 1 minute.
     /// </summary>
     /// <remarks>
@@ -67,7 +67,7 @@ public class FactorioMeasurementOptions
     public TimeSpan ReconnectionInterval { get; set; } = TimeSpan.FromMinutes(1);
 
     /// <summary>
-    ///     If true, commands on the factorio server will be spread over one period instead of being performed at once.\
+    ///     If true, commands on the factorio server will be spread over one period instead of being performed at once. <br />
     ///     Defaults to true.
     /// </summary>
     public bool SpreadMeasurements { get; set; } = true;

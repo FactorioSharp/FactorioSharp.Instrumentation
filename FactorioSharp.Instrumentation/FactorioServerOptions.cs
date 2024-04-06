@@ -23,7 +23,7 @@ public class FactorioServerOptions
 
     /// <summary>
     ///     If false, the commands will be executed on the factorio server using the <c>/c</c> command instead of the silent <c>/sc</c>.
-    ///     Setting this to false can help diagnose issues.\
+    ///     Setting this to false can help diagnose issues. <br />
     ///     Defaults to true.
     /// </summary>
     public bool SilentCommands { get; set; } = true;
