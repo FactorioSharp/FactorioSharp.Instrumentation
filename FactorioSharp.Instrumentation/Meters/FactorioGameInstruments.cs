@@ -168,7 +168,7 @@ static class FactorioGameInstruments
                     )
                 )
             ),
-            "W",
+            "J/tick",
             "The current power being produced"
         );
 
@@ -191,7 +191,7 @@ static class FactorioGameInstruments
                     )
                 )
             ),
-            "W",
+            "J/tick",
             "The current power being produced"
         );
 
@@ -214,7 +214,7 @@ static class FactorioGameInstruments
                     )
                 )
             ),
-            "W",
+            "J",
             "The current power being produced"
         );
     }

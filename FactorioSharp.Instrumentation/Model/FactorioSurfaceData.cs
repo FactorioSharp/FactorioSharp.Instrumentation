@@ -8,6 +8,13 @@ class FactorioSurfaceData
 
 class FactorioElectronicNetworkData
 {
+    /// <summary>
+    ///     Energy flow in J/tick
+    /// </summary>
     public FactorioFlowData<double> Flow { get; set; } = new();
+
+    /// <summary>
+    ///     Buffer in J
+    /// </summary>
     public Dictionary<string, double> Buffer { get; set; } = new();
 }
