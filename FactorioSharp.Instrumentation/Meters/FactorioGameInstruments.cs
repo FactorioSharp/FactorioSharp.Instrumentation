@@ -154,24 +154,17 @@ static class FactorioGameInstruments
             () => gameData.Surfaces.SelectMany(
                 surfaceKv => surfaceKv.Value.ElectricNetworks.SelectMany(
                     networkKv => networkKv.Value.Flow.Inputs.Select(
-                        entityKv =>
-                        {
-                            ElectricEntity entity = gameData.ElectricEntities[entityKv.Key];
-                            return new Measurement<double>(
-                                entityKv.Value,
-                                baseTags.Concat(
-                                    new Dictionary<string, object?>
-                                    {
-                                        { "factorio.surface", surfaceKv.Key },
-                                        { "factorio.network", networkKv.Key },
-                                        { "factorio.entity", entityKv.Key },
-                                        { "factorio.energy.max_usage", entity.MaxEnergyUsage },
-                                        { "factorio.energy.max_production", entity.MaxEnergyProduction },
-                                        { "factorio.energy.buffer_capacity", entity.BufferCapacity }
-                                    }
-                                )
-                            );
-                        }
+                        entityKv => new Measurement<double>(
+                            entityKv.Value,
+                            baseTags.Concat(
+                                new Dictionary<string, object?>
+                                {
+                                    { "factorio.surface", surfaceKv.Key },
+                                    { "factorio.network", networkKv.Key },
+                                    { "factorio.entity", entityKv.Key }
+                                }
+                            )
+                        )
                     )
                 )
             ),
@@ -184,24 +177,17 @@ static class FactorioGameInstruments
             () => gameData.Surfaces.SelectMany(
                 surfaceKv => surfaceKv.Value.ElectricNetworks.SelectMany(
                     networkKv => networkKv.Value.Flow.Outputs.Select(
-                        entityKv =>
-                        {
-                            ElectricEntity entity = gameData.ElectricEntities[entityKv.Key];
-                            return new Measurement<double>(
-                                entityKv.Value,
-                                baseTags.Concat(
-                                    new Dictionary<string, object?>
-                                    {
-                                        { "factorio.surface", surfaceKv.Key },
-                                        { "factorio.network", networkKv.Key },
-                                        { "factorio.entity", entityKv.Key },
-                                        { "factorio.energy.max_usage", entity.MaxEnergyUsage },
-                                        { "factorio.energy.max_production", entity.MaxEnergyProduction },
-                                        { "factorio.energy.buffer_capacity", entity.BufferCapacity }
-                                    }
-                                )
-                            );
-                        }
+                        entityKv => new Measurement<double>(
+                            entityKv.Value,
+                            baseTags.Concat(
+                                new Dictionary<string, object?>
+                                {
+                                    { "factorio.surface", surfaceKv.Key },
+                                    { "factorio.network", networkKv.Key },
+                                    { "factorio.entity", entityKv.Key }
+                                }
+                            )
+                        )
                     )
                 )
             ),
@@ -214,24 +200,17 @@ static class FactorioGameInstruments
             () => gameData.Surfaces.SelectMany(
                 surfaceKv => surfaceKv.Value.ElectricNetworks.SelectMany(
                     networkKv => networkKv.Value.Buffer.Select(
-                        entityKv =>
-                        {
-                            ElectricEntity entity = gameData.ElectricEntities[entityKv.Key];
-                            return new Measurement<double>(
-                                entityKv.Value,
-                                baseTags.Concat(
-                                    new Dictionary<string, object?>
-                                    {
-                                        { "factorio.surface", surfaceKv.Key },
-                                        { "factorio.network", networkKv.Key },
-                                        { "factorio.entity", entityKv.Key },
-                                        { "factorio.energy.max_usage", entity.MaxEnergyUsage },
-                                        { "factorio.energy.max_production", entity.MaxEnergyProduction },
-                                        { "factorio.energy.buffer_capacity", entity.BufferCapacity }
-                                    }
-                                )
-                            );
-                        }
+                        entityKv => new Measurement<double>(
+                            entityKv.Value,
+                            baseTags.Concat(
+                                new Dictionary<string, object?>
+                                {
+                                    { "factorio.surface", surfaceKv.Key },
+                                    { "factorio.network", networkKv.Key },
+                                    { "factorio.entity", entityKv.Key }
+                                }
+                            )
+                        )
                     )
                 )
             ),

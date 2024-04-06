@@ -109,6 +109,7 @@ class UpdatePowerJob : Job
                         end
                         
                         result[k].input = statistics.get_flow_count{ name = k, input = true, precision_index = defines.flow_precision_index.five_seconds, sample_index = 1 }
+                        result[k].all_time_input = statistics.input_counts[k]
                     end
                     
                     for k, _ in pairs(statistics.output_counts) do
@@ -116,7 +117,14 @@ class UpdatePowerJob : Job
                             result[k] = {}
                         end
                         
-                        result[k].input = statistics.get_flow_count{ name = k, input = false, precision_index = defines.flow_precision_index.five_seconds, sample_index = 1 }
+                        result[k].output = statistics.get_flow_count{ name = k, input = false, precision_index = defines.flow_precision_index.five_seconds, sample_index = 1 }
+                        result[k].all_time_output = statistics.input_counts[k]
+                    end
+                    
+                    for k, _ in pairs(result) do
+                        if (result[k].all_time_input and result[k].all_time_output) then
+                            result[k].buffer = result[k].all_time_input - result[k].all_time_output
+                        end
                     end
                 else
                     result.invalid = true;
