@@ -3,6 +3,11 @@ namespace FactorioSharp.Instrumentation.Model;
 class ElectricEntity
 {
     public string Name { get; set; }
+
+    public double BufferCapacity { get; set; }
+    public double MaxEnergyUsage { get; set; }
+    public double MaxEnergyProduction { get; set; }
+
     public ElectricEntityType Type {
         get {
             ElectricEntityType result = ElectricEntityType.None;
@@ -25,7 +30,4 @@ class ElectricEntity
             return result;
         }
     }
-    public double BufferCapacity { get; set; }
-    public double MaxEnergyUsage { get; set; }
-    public double MaxEnergyProduction { get; set; }
 }

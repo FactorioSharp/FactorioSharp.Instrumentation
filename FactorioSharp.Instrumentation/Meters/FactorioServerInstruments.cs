@@ -10,6 +10,6 @@ class FactorioServerInstruments
         Dictionary<string, object?> tags = new();
         data.EnrichTags(tags);
 
-        meter.CreateObservableUpDownCounter("factorio.server.status", () => data.IsUp ? 1 : 0, null, "Is the factorio server up ?", tags);
+        meter.CreateObservableUpDownCounter("factorio.server.status", () => new Measurement<int>(data.IsUp ? 1 : 0, tags), null, "Is the factorio server up ?");
     }
 }

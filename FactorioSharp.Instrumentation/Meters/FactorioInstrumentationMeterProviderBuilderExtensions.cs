@@ -5,8 +5,14 @@ using Microsoft.Extensions.Options;
 
 namespace FactorioSharp.Instrumentation.Meters;
 
+/// <summary>
+///     Add factorio instrumentation to a service collection
+/// </summary>
 public static class FactorioInstrumentationMeterProviderBuilderExtensions
 {
+    /// <summary>
+    ///     Add factorio instrumentation to a service collection
+    /// </summary>
     public static IServiceCollection AddFactorioInstrumentation(this IServiceCollection services, Action<FactorioInstrumentationOptions>? configureOptions = null)
     {
         if (configureOptions != null)

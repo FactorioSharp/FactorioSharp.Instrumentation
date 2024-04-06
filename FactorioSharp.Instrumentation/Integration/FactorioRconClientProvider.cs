@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 
 namespace FactorioSharp.Instrumentation.Integration;
 
-public class FactorioRconClientProvider : IDisposable
+class FactorioRconClientProvider : IDisposable
 {
     FactorioRconClient? _client;
     readonly Uri _uri;

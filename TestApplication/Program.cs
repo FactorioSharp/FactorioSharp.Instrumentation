@@ -14,6 +14,7 @@ builder.Services.AddOpenTelemetry()
             .AddFactorioInstrumentation(
                 options =>
                 {
+                    options.Server.Name = "Grafcity";
                     options.Server.Uri = new Uri("http://localhost:27015");
                     options.Server.RconPassword = "password";
                 }

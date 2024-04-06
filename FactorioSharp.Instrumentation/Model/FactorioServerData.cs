@@ -1,6 +1,6 @@
 ﻿namespace FactorioSharp.Instrumentation.Model;
 
-public class FactorioServerData
+class FactorioServerData
 {
     public FactorioServerData(Uri uri, string? name)
     {
