@@ -18,7 +18,7 @@ class UpdateItemsJob : Job
         _logger = logger;
     }
 
-    public override async Task OnConnectAsync(FactorioRconClient client, FactorioData _, FactorioMeterOptionsInternal options, CancellationToken __)
+    public override async Task OnConnectAsync(FactorioRconClient client, FactorioData _, FactorioMeasurementOptionsInternal options, CancellationToken __)
     {
         LuaCustomTable<string, LuaItemPrototype>? itemPrototypesTable = await client.ReadAsync(g => g.Game.ItemPrototypes);
         IEnumerable<string> itemPrototypes = itemPrototypesTable?.Keys ?? [];
@@ -27,7 +27,7 @@ class UpdateItemsJob : Job
         _logger.LogInformation("Items: {items}", string.Join(", ", options.MeasuredItems));
     }
 
-    public override async Task OnTickAsync(FactorioRconClient client, FactorioData data, FactorioMeterOptionsInternal options, CancellationToken cancellationToken)
+    public override async Task OnTickAsync(FactorioRconClient client, FactorioData data, FactorioMeasurementOptionsInternal options, CancellationToken cancellationToken)
     {
         foreach (string? force in options.MeasuredForces)
         {

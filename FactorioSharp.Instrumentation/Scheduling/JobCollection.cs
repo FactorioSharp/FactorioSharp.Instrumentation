@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace FactorioSharp.Instrumentation.Scheduling;
 
-class JobCollection : IEnumerable<Job>
+class JobCollection : IReadOnlyCollection<Job>
 {
     readonly List<Job> _jobs;
     readonly ILogger<JobCollection> _logger;
@@ -23,7 +23,7 @@ class JobCollection : IEnumerable<Job>
 
     public void Add(Job item) => _jobs.Add(item);
 
-    public async Task ExecuteOnStartAsync(FactorioData data, FactorioMeterOptionsInternal options, CancellationToken stoppingToken)
+    public async Task ExecuteOnStartAsync(FactorioData data, FactorioMeasurementOptionsInternal options, CancellationToken stoppingToken)
     {
         foreach (Job job in _jobs)
         {
@@ -31,7 +31,7 @@ class JobCollection : IEnumerable<Job>
         }
     }
 
-    public async Task ExecuteOnConnectAsync(FactorioData data, FactorioRconClient client, FactorioMeterOptionsInternal options, CancellationToken stoppingToken)
+    public async Task ExecuteOnConnectAsync(FactorioData data, FactorioRconClient client, FactorioMeasurementOptionsInternal options, CancellationToken stoppingToken)
     {
         foreach (Job job in _jobs)
         {
@@ -39,7 +39,7 @@ class JobCollection : IEnumerable<Job>
         }
     }
 
-    public async Task ExecuteOnTickAsync(FactorioData data, FactorioRconClient client, FactorioMeterOptionsInternal options, CancellationToken stoppingToken)
+    public async Task ExecuteOnTickAsync(FactorioData data, FactorioRconClient client, FactorioMeasurementOptionsInternal options, CancellationToken stoppingToken)
     {
         foreach (Job job in _jobs)
         {
@@ -47,7 +47,13 @@ class JobCollection : IEnumerable<Job>
         }
     }
 
-    public async Task ExecuteOnDisconnectAsync(FactorioData data, FactorioMeterOptionsInternal options, CancellationToken stoppingToken)
+    public async Task ExecuteOnTickAsync(int index, FactorioData data, FactorioRconClient client, FactorioMeasurementOptionsInternal options, CancellationToken stoppingToken)
+    {
+        Job? job = _jobs[index];
+        await HandleExceptions(() => job.OnTickAsync(client, data, options, stoppingToken), job, "OnTick");
+    }
+
+    public async Task ExecuteOnDisconnectAsync(FactorioData data, FactorioMeasurementOptionsInternal options, CancellationToken stoppingToken)
     {
         foreach (Job job in _jobs)
         {
@@ -55,7 +61,7 @@ class JobCollection : IEnumerable<Job>
         }
     }
 
-    public async Task ExecuteOnStopAsync(FactorioData data, FactorioMeterOptionsInternal options, CancellationToken stoppingToken)
+    public async Task ExecuteOnStopAsync(FactorioData data, FactorioMeasurementOptionsInternal options, CancellationToken stoppingToken)
     {
         foreach (Job job in _jobs)
         {
@@ -63,6 +69,7 @@ class JobCollection : IEnumerable<Job>
         }
     }
 
+    public int Count => _jobs.Count;
     public IEnumerator<Job> GetEnumerator() => _jobs.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_jobs).GetEnumerator();
 

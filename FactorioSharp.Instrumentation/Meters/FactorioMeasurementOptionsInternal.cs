@@ -5,9 +5,9 @@
 ///     This type is filled using the values configured by the user and values from the server.
 ///     For example, the content of MeasuredItems is the intersection between the items requested by the user and the ones provided by the server.
 /// </summary>
-class FactorioMeterOptionsInternal
+class FactorioMeasurementOptionsInternal
 {
-    public FactorioMeterOptionsInternal(FactorioMeasurementOptions original)
+    public FactorioMeasurementOptionsInternal(FactorioMeasurementOptions original)
     {
         Original = original;
 

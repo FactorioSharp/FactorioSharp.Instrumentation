@@ -18,7 +18,7 @@ class UpdateForcesJob : Job
         _logger = logger;
     }
 
-    public override async Task OnConnectAsync(FactorioRconClient client, FactorioData data, FactorioMeterOptionsInternal options, CancellationToken _)
+    public override async Task OnConnectAsync(FactorioRconClient client, FactorioData data, FactorioMeasurementOptionsInternal options, CancellationToken _)
     {
         LuaCustomTable<Union2142551273, LuaForce>? forcePrototypeTypes = await client.ReadAsync(g => g.Game.Forces);
         IEnumerable<string> forcePrototypes = forcePrototypeTypes?.Keys.Where(k => k.IsT1).Select(k => k.AsT1) ?? [];

@@ -6,16 +6,13 @@ namespace FactorioSharp.Instrumentation.Integration;
 class FactorioRconClientProvider : IDisposable
 {
     FactorioRconClient? _client;
-    readonly Uri _uri;
-    readonly string _password;
+    readonly FactorioServerOptions _options;
     readonly ILogger<FactorioRconClientProvider> _logger;
 
-    public FactorioRconClientProvider(Uri uri, string password, ILogger<FactorioRconClientProvider> logger)
+    public FactorioRconClientProvider(FactorioServerOptions options, ILogger<FactorioRconClientProvider> logger)
     {
-        _uri = uri;
-        _password = password;
+        _options = options;
         _logger = logger;
-
     }
 
     /// <summary>
@@ -26,41 +23,46 @@ class FactorioRconClientProvider : IDisposable
     /// </remarks>
     public async Task<GetConnectedClientResult> TryGetConnectedClient()
     {
+        if (_options.Uri == null || _options.RconPassword == null)
+        {
+            throw new InvalidOperationException("Could not determine server URI or RCON password");
+        }
+
         try
         {
             if (_client is { Connected: true })
             {
-                return GetConnectedClientResult.Success(_uri, _client);
+                return GetConnectedClientResult.Success(_options.Uri, _client);
             }
 
             if (_client != null)
             {
-                _logger.LogDebug("Connection to {uri} has been lost, reconnection attempt...", _uri);
+                _logger.LogDebug("Connection to {uri} has been lost, reconnection attempt...", _options.Uri);
                 _client.Dispose();
             }
             else
             {
-                _logger.LogDebug("Connection attempt to {uri}...", _uri);
+                _logger.LogDebug("Connection attempt to {uri}...", _options.Uri);
             }
 
-            _client = new FactorioRconClient(_uri.Host, _uri.Port);
+            _client = new FactorioRconClient(_options.Uri.Host, _options.Uri.Port) { Silent = _options.SilentCommands };
 
 
-            if (await _client.ConnectAsync(_password))
+            if (await _client.ConnectAsync(_options.RconPassword))
             {
-                _logger.LogDebug("Connected to {uri}.", _uri);
-                return GetConnectedClientResult.Success(_uri, _client);
+                _logger.LogDebug("Connected to {uri}.", _options.Uri);
+                return GetConnectedClientResult.Success(_options.Uri, _client);
             }
 
-            _logger.LogDebug("Connection to {uri} failed.", _uri);
+            _logger.LogDebug("Connection to {uri} failed.", _options.Uri);
 
             _client.Dispose();
             _client = null;
-            return GetConnectedClientResult.Failure(_uri, $"Connection or authentication to {_uri} failed, double check the host, port and password.");
+            return GetConnectedClientResult.Failure(_options.Uri, $"Connection or authentication to {_options.Uri} failed, double check the host, port and password.");
         }
         catch (Exception exn)
         {
-            return GetConnectedClientResult.Failure(_uri, exn);
+            return GetConnectedClientResult.Failure(_options.Uri, exn);
         }
     }
 

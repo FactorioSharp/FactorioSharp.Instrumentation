@@ -15,7 +15,7 @@ class UpdateGameJob : Job
         _logger = logger;
     }
 
-    public override async Task OnTickAsync(FactorioRconClient client, FactorioData data, FactorioMeterOptionsInternal options, CancellationToken cancellationToken)
+    public override async Task OnTickAsync(FactorioRconClient client, FactorioData data, FactorioMeasurementOptionsInternal options, CancellationToken cancellationToken)
     {
         bool paused = data.Game.Time.Paused;
 

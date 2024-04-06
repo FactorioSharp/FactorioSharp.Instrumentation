@@ -18,7 +18,7 @@ class UpdateFluidsJob : Job
         _logger = logger;
     }
 
-    public override async Task OnConnectAsync(FactorioRconClient client, FactorioData _, FactorioMeterOptionsInternal options, CancellationToken __)
+    public override async Task OnConnectAsync(FactorioRconClient client, FactorioData _, FactorioMeasurementOptionsInternal options, CancellationToken __)
     {
         LuaCustomTable<string, LuaFluidPrototype>? fluidPrototypesTable = await client.ReadAsync(g => g.Game.FluidPrototypes);
         IEnumerable<string> fluidPrototypes = fluidPrototypesTable?.Keys ?? [];
@@ -27,7 +27,7 @@ class UpdateFluidsJob : Job
         _logger.LogInformation("Fluids: {fluids}", string.Join(", ", options.MeasuredFluids));
     }
 
-    public override async Task OnTickAsync(FactorioRconClient client, FactorioData data, FactorioMeterOptionsInternal options, CancellationToken cancellationToken)
+    public override async Task OnTickAsync(FactorioRconClient client, FactorioData data, FactorioMeasurementOptionsInternal options, CancellationToken cancellationToken)
     {
         foreach (string? force in options.MeasuredForces)
         {

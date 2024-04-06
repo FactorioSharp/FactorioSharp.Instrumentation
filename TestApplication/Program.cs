@@ -17,6 +17,8 @@ builder.Services.AddOpenTelemetry()
                     options.Server.Name = "Grafcity";
                     options.Server.Uri = new Uri("http://localhost:27015");
                     options.Server.RconPassword = "password";
+
+                    options.Server.SilentCommands = false;
                 }
             )
             .AddPrometheusHttpListener(options => options.UriPrefixes = ["http://localhost:9184/"])

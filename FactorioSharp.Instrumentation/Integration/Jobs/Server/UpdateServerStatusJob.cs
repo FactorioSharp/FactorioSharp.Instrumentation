@@ -15,7 +15,7 @@ class UpdateServerStatusJob : Job
         _logger = logger;
     }
 
-    public override Task OnConnectAsync(FactorioRconClient _, FactorioData data, FactorioMeterOptionsInternal __, CancellationToken ___)
+    public override Task OnConnectAsync(FactorioRconClient _, FactorioData data, FactorioMeasurementOptionsInternal __, CancellationToken ___)
     {
         data.Server.IsUp = true;
 
@@ -24,7 +24,7 @@ class UpdateServerStatusJob : Job
         return Task.CompletedTask;
     }
 
-    public override Task OnDisconnectAsync(FactorioData data, FactorioMeterOptionsInternal _, CancellationToken __)
+    public override Task OnDisconnectAsync(FactorioData data, FactorioMeasurementOptionsInternal _, CancellationToken __)
     {
         data.Server.IsUp = false;
 

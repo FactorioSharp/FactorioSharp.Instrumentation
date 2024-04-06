@@ -5,7 +5,7 @@ namespace FactorioSharp.Instrumentation.Meters;
 
 class FactorioServerInstruments
 {
-    public static void Setup(Meter meter, FactorioServerData data, FactorioMeterOptionsInternal _)
+    public static void Setup(Meter meter, FactorioServerData data, FactorioMeasurementOptionsInternal _)
     {
         Dictionary<string, object?> tags = new();
         data.EnrichTags(tags);

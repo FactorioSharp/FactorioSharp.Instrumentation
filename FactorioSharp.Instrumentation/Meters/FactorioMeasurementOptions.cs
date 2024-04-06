@@ -1,7 +1,7 @@
 namespace FactorioSharp.Instrumentation.Meters;
 
 /// <summary>
-/// Options regarding the collection of data from the factorio server
+///     Options regarding the collection of data from the factorio server
 /// </summary>
 public class FactorioMeasurementOptions
 {
@@ -65,4 +65,10 @@ public class FactorioMeasurementOptions
     ///     a scrape_interval of 15s, this interval should also be 15s.
     /// </remarks>
     public TimeSpan ReconnectionInterval { get; set; } = TimeSpan.FromMinutes(1);
+
+    /// <summary>
+    ///     If true, commands on the factorio server will be spread over one period instead of being performed at once.\
+    ///     Defaults to true.
+    /// </summary>
+    public bool SpreadMeasurements { get; set; } = true;
 }

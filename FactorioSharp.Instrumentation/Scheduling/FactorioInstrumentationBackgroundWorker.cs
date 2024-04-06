@@ -5,6 +5,7 @@ using FactorioSharp.Instrumentation.Integration.Jobs.Production;
 using FactorioSharp.Instrumentation.Integration.Jobs.Server;
 using FactorioSharp.Instrumentation.Meters;
 using FactorioSharp.Instrumentation.Model;
+using FactorioSharp.Rcon;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -18,7 +19,7 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
 {
     readonly FactorioRconClientProvider _clientProvider;
     bool _isConnected;
-    readonly FactorioMeterOptionsInternal _options;
+    readonly FactorioMeasurementOptionsInternal _options;
     readonly ILogger<FactorioInstrumentationBackgroundWorker> _logger;
     readonly FactorioData _data;
     readonly JobCollection _jobs;
@@ -26,17 +27,11 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
 
     public FactorioInstrumentationBackgroundWorker(IOptions<FactorioInstrumentationOptions> options, ILoggerFactory loggerFactory)
     {
-
-
-        _clientProvider = new FactorioRconClientProvider(
-            options.Value.Server.Uri ?? throw new ArgumentNullException(nameof(options.Value.Server.Uri)),
-            options.Value.Server.RconPassword ?? throw new ArgumentNullException(nameof(options.Value.Server.Uri)),
-            loggerFactory.CreateLogger<FactorioRconClientProvider>()
-        );
-        _options = new FactorioMeterOptionsInternal(options.Value.Measurement);
+        _clientProvider = new FactorioRconClientProvider(options.Value.Server, loggerFactory.CreateLogger<FactorioRconClientProvider>());
+        _options = new FactorioMeasurementOptionsInternal(options.Value.Measurement);
         _logger = loggerFactory.CreateLogger<FactorioInstrumentationBackgroundWorker>();
 
-        _data = new FactorioData(options.Value.Server.Uri, options.Value.Server.Name);
+        _data = new FactorioData(options.Value.Server.Uri ?? throw new ArgumentNullException(nameof(options.Value.Server.Uri)), options.Value.Server.Name);
 
         _meter = CreateMeter();
         FactorioServerInstruments.Setup(_meter, _data.Server, _options);
@@ -78,8 +73,6 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
 
         while (!stoppingToken.IsCancellationRequested)
         {
-            DateTime startTime = DateTime.Now;
-
             FactorioRconClientProvider.GetConnectedClientResult result = await _clientProvider.TryGetConnectedClient();
             if (result.Succeeded)
             {
@@ -102,7 +95,16 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
                     _logger.LogInformation("Initialization done.");
                 }
 
-                await _jobs.ExecuteOnTickAsync(_data, result.Client!, _options, stoppingToken);
+                DateTime startTime = DateTime.Now;
+
+                if (_options.Original.SpreadMeasurements)
+                {
+                    await SpreadTicksOverOnePeriod(result.Client!, stoppingToken);
+                }
+                else
+                {
+                    await _jobs.ExecuteOnTickAsync(_data, result.Client!, _options, stoppingToken);
+                }
 
                 TimeSpan elapsed = DateTime.Now - startTime;
                 TimeSpan toWait = _options.Original.ObservationInterval - elapsed;
@@ -135,5 +137,26 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
         await _jobs.ExecuteOnStopAsync(_data, _options, stoppingToken);
     }
 
-    Meter CreateMeter() => new(FactorioInstrumentationConstants.MeterName, FactorioInstrumentationConstants.MeterVersion);
+    async Task SpreadTicksOverOnePeriod(FactorioRconClient client, CancellationToken cancellationToken)
+    {
+        List<Task> tasks = [];
+        TimeSpan baseOffset = _options.Original.ObservationInterval / _jobs.Count;
+        for (int i = 0; i < _jobs.Count; i++)
+        {
+            tasks.Add(OffsetTick(i));
+
+            continue;
+
+            async Task OffsetTick(int index)
+            {
+                TimeSpan offset = baseOffset * index;
+                await Task.Delay(offset, cancellationToken);
+                await _jobs.ExecuteOnTickAsync(index, _data, client, _options, cancellationToken);
+            }
+        }
+
+        await Task.WhenAll(tasks);
+    }
+
+    static Meter CreateMeter() => new(FactorioInstrumentationConstants.MeterName, FactorioInstrumentationConstants.MeterVersion);
 }

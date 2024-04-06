@@ -15,7 +15,7 @@ class UpdateServerPlayersJob : Job
         _logger = logger;
     }
 
-    public override async Task OnTickAsync(FactorioRconClient client, FactorioData data, FactorioMeterOptionsInternal _, CancellationToken __)
+    public override async Task OnTickAsync(FactorioRconClient client, FactorioData data, FactorioMeasurementOptionsInternal _, CancellationToken __)
     {
         uint totalPlayerCount = await client.ReadAsync(g => g.Game.Players.Length);
 

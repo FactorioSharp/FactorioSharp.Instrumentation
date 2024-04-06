@@ -17,7 +17,7 @@ class UpdatePowerJob : Job
         _logger = logger;
     }
 
-    public override async Task OnConnectAsync(FactorioRconClient client, FactorioData data, FactorioMeterOptionsInternal options, CancellationToken cancellationToken)
+    public override async Task OnConnectAsync(FactorioRconClient client, FactorioData data, FactorioMeasurementOptionsInternal options, CancellationToken cancellationToken)
     {
         ElectricEntity[] entities = await GetElectricEntities(client);
         data.Game.ElectricEntities = entities.ToDictionary(e => e.Name, e => e);
@@ -25,7 +25,7 @@ class UpdatePowerJob : Job
         _logger.LogInformation("Electric entities: {entities}", string.Join(", ", entities.Select(e => $"{e.Name} ({e.Type})")));
     }
 
-    public override async Task OnTickAsync(FactorioRconClient client, FactorioData data, FactorioMeterOptionsInternal options, CancellationToken cancellationToken)
+    public override async Task OnTickAsync(FactorioRconClient client, FactorioData data, FactorioMeasurementOptionsInternal options, CancellationToken cancellationToken)
     {
         Dictionary<string, Dictionary<uint, Dictionary<string, EntityConsumptionData>>>? consumption = await GetConsumptionData(client);
         if (consumption == null)

@@ -17,7 +17,7 @@ class UpdateMineableResourcesJob : Job
         _logger = logger;
     }
 
-    public override async Task OnConnectAsync(FactorioRconClient client, FactorioData data, FactorioMeterOptionsInternal options, CancellationToken cancellationToken)
+    public override async Task OnConnectAsync(FactorioRconClient client, FactorioData data, FactorioMeasurementOptionsInternal options, CancellationToken cancellationToken)
     {
         MineableResource[] resources = await GetMineableResources(client);
         data.Game.MineableResources = resources.ToDictionary(r => r.Name, r => r);
@@ -25,7 +25,7 @@ class UpdateMineableResourcesJob : Job
         _logger.LogInformation("Mineable resources: {resources}", string.Join(", ", resources.Select(r => $"{r.Name} ({r.Category})")));
     }
 
-    public override async Task OnTickAsync(FactorioRconClient client, FactorioData data, FactorioMeterOptionsInternal options, CancellationToken cancellationToken)
+    public override async Task OnTickAsync(FactorioRconClient client, FactorioData data, FactorioMeasurementOptionsInternal options, CancellationToken cancellationToken)
     {
         foreach (string? surface in options.MeasuredSurfaces)
         {

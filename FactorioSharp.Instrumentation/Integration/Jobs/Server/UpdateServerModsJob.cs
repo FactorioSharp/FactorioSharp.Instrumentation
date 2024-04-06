@@ -15,7 +15,7 @@ class UpdateServerModsJob : Job
         _logger = logger;
     }
 
-    public override async Task OnConnectAsync(FactorioRconClient client, FactorioData data, FactorioMeterOptionsInternal _, CancellationToken __)
+    public override async Task OnConnectAsync(FactorioRconClient client, FactorioData data, FactorioMeasurementOptionsInternal _, CancellationToken __)
     {
         Dictionary<string, string> mods = await client.ReadAsync(g => g.Game.ActiveMods) ?? new Dictionary<string, string>();
         string activeModsString = string.Join(", ", mods.Select(e => $"{e.Key} v{e.Value}"));

@@ -18,7 +18,7 @@ class UpdateSurfacesJob : Job
         _logger = logger;
     }
 
-    public override async Task OnConnectAsync(FactorioRconClient client, FactorioData data, FactorioMeterOptionsInternal options, CancellationToken cancellationToken)
+    public override async Task OnConnectAsync(FactorioRconClient client, FactorioData data, FactorioMeasurementOptionsInternal options, CancellationToken cancellationToken)
     {
         LuaCustomTable<Union2142551273, LuaSurface>? surfacePrototypeTypes = await client.ReadAsync(g => g.Game.Surfaces);
         IEnumerable<string> surfacePrototypes = surfacePrototypeTypes?.Keys.Where(k => k.IsT1).Select(k => k.AsT1) ?? [];
