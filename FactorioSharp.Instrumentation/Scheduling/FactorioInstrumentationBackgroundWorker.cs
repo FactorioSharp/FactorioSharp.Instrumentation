@@ -33,7 +33,7 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
             options.Value.Server.RconPassword ?? throw new ArgumentNullException(nameof(options.Value.Server.Uri)),
             loggerFactory.CreateLogger<FactorioRconClientProvider>()
         );
-        _options = new FactorioMeterOptionsInternal(options.Value.Meter);
+        _options = new FactorioMeterOptionsInternal(options.Value.Measurement);
         _logger = loggerFactory.CreateLogger<FactorioInstrumentationBackgroundWorker>();
 
         _data = new FactorioData(options.Value.Server.Uri, options.Value.Server.Name);
@@ -72,9 +72,6 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        TimeSpan minDelayBetweenObservations = TimeSpan.FromSeconds(1);
-        TimeSpan minDelayBetweenConnectionAttempts = TimeSpan.FromSeconds(10);
-
         await _jobs.ExecuteOnStartAsync(_data, _options, stoppingToken);
 
         _isConnected = false;
@@ -108,7 +105,7 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
                 await _jobs.ExecuteOnTickAsync(_data, result.Client!, _options, stoppingToken);
 
                 TimeSpan elapsed = DateTime.Now - startTime;
-                TimeSpan toWait = minDelayBetweenObservations - elapsed;
+                TimeSpan toWait = _options.Original.ObservationInterval - elapsed;
 
                 if (toWait > TimeSpan.Zero)
                 {
@@ -131,7 +128,7 @@ class FactorioInstrumentationBackgroundWorker : BackgroundService
                 }
 
                 _logger.LogError(result.Exception, "Could not connect to server at {host}:{port}. Reason: {reason}.", result.Uri.Host, result.Uri.Port, result.FailureReason);
-                await Task.Delay(minDelayBetweenConnectionAttempts, stoppingToken);
+                await Task.Delay(_options.Original.ReconnectionInterval, stoppingToken);
             }
         }
 

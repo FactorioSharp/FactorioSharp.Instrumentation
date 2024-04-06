@@ -1,13 +1,13 @@
 ﻿namespace FactorioSharp.Instrumentation.Meters;
 
 /// <summary>
-///     Internal equivalent of <see cref="FactorioMeterOptions" />.
+///     Internal equivalent of <see cref="FactorioMeasurementOptions" />.
 ///     This type is filled using the values configured by the user and values from the server.
 ///     For example, the content of MeasuredItems is the intersection between the items requested by the user and the ones provided by the server.
 /// </summary>
 class FactorioMeterOptionsInternal
 {
-    public FactorioMeterOptionsInternal(FactorioMeterOptions original)
+    public FactorioMeterOptionsInternal(FactorioMeasurementOptions original)
     {
         Original = original;
 
@@ -25,5 +25,5 @@ class FactorioMeterOptionsInternal
     /// <summary>
     ///     Original option object, the one provided by the user
     /// </summary>
-    public FactorioMeterOptions Original { get; }
+    public FactorioMeasurementOptions Original { get; }
 }

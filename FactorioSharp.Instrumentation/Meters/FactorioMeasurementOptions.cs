@@ -1,9 +1,9 @@
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-
 namespace FactorioSharp.Instrumentation.Meters;
 
-public class FactorioMeterOptions
+/// <summary>
+/// Options regarding the collection of data from the factorio server
+/// </summary>
+public class FactorioMeasurementOptions
 {
     /// <summary>
     ///     If set to true, the value of <see cref="MeasuredForces" /> will be ignored and all the available forces will be measured instead
@@ -45,5 +45,24 @@ public class FactorioMeterOptions
     /// </summary>
     public HashSet<string> MeasuredFluids { get; } = [];
 
-    public ILoggerFactory LoggerFactory { get; set; } = NullLoggerFactory.Instance;
+    /// <summary>
+    ///     Rate at which data must be read from the factorio server.
+    ///     The higher this value, the more intensive the data collection will be on the server.\
+    ///     Defaults to 15 seconds.
+    /// </summary>
+    /// <remarks>
+    ///     There is no point in having a value higher than the refresh interval of the tool that consumes the telemetry. For example if prometheus is collecting the data at
+    ///     a scrape_interval of 15s, this interval should also be 15s.
+    /// </remarks>
+    public TimeSpan ObservationInterval { get; set; } = TimeSpan.FromSeconds(15);
+
+    /// <summary>
+    ///     Interval of time between two connection attempts: when the server is lost, how often should we try to reconnect.\
+    ///     Defaults to 1 minute.
+    /// </summary>
+    /// <remarks>
+    ///     There is no point in having a value higher than the refresh interval of the tool that consumes the telemetry. For example if prometheus is collecting the data at
+    ///     a scrape_interval of 15s, this interval should also be 15s.
+    /// </remarks>
+    public TimeSpan ReconnectionInterval { get; set; } = TimeSpan.FromMinutes(1);
 }

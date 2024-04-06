@@ -2,15 +2,14 @@
 
 namespace FactorioSharp.Instrumentation;
 
+/// <summary>
+/// Options of the factorio instrumentation library
+/// </summary>
 public class FactorioInstrumentationOptions
 {
+    /// <inheritdoc cref="FactorioServerOptions"/>
     public FactorioServerOptions Server { get; set; } = new();
-    public FactorioMeterOptions Meter { get; set; } = new();
-}
-
-public class FactorioServerOptions
-{
-    public Uri? Uri { get; set; }
-    public string? RconPassword { get; set; }
-    public string? Name { get; set; }
+    
+    /// <inheritdoc cref="FactorioMeasurementOptions"/>
+    public FactorioMeasurementOptions Measurement { get; set; } = new();
 }
