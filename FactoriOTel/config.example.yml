@@ -1,0 +1,9 @@
+server:
+  - name: my-awesome-server
+    rcon-endpoint: localhost:1234
+    rcon-password: my-awesome-password
+    
+exporters:
+  prometheus:
+    endpoint: localhost:1472
+  console:

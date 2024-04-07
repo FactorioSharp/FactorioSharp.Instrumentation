@@ -1,0 +1,64 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>12</LangVersion>
+        <Title>FactoriOTel</Title>
+        <Description>Export Factorio data as OpenTelemetry signals </Description>
+        <Authors>Ismail Bennani</Authors>
+        <NeutralLanguage>en</NeutralLanguage>
+        <Copyright>Ismail Bennani</Copyright>
+        <PackageProjectUrl>https://github.com/FactorioSharp/FactoriOTel</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/FactorioSharp/FactoriOTel</RepositoryUrl>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageTags>factorio, instrumentation, diagnostics, metrics, telemetry</PackageTags>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <TrimMode>partial</TrimMode>
+        <DebuggerSupport>false</DebuggerSupport>
+        <EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
+        <EnableUnsafeUTF7Encoding>false</EnableUnsafeUTF7Encoding>
+        <EventSourceSupport>false</EventSourceSupport>
+        <HttpActivityPropagationSupport>false</HttpActivityPropagationSupport>
+        <InvariantGlobalization>true</InvariantGlobalization>
+        <MetadataUpdaterSupport>false</MetadataUpdaterSupport>
+        <StackTraceSupport>false</StackTraceSupport>
+        <UseNativeHttpHandler>true</UseNativeHttpHandler>
+        <UseSystemResourceKeys>true</UseSystemResourceKeys>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <None Include="README.nuget.md" Pack="true" PackagePath="README.md" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="CommandLineParser" Version="2.9.1" />
+      <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+      <PackageReference Include="MinVer" Version="5.0.0">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.8.0" />
+      <PackageReference Include="OpenTelemetry.Exporter.Prometheus.HttpListener" Version="1.8.0-rc.1" />
+      <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.8.0" />
+      <PackageReference Include="Serilog.Extensions.Hosting" Version="8.0.0" />
+      <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
+      <PackageReference Include="YamlDotNet" Version="15.1.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\FactorioSharp.Instrumentation\FactorioSharp.Instrumentation.csproj" />
+    </ItemGroup>
+
+    <PropertyGroup>
+        <MinVerTagPrefix>v</MinVerTagPrefix>
+    </PropertyGroup>
+
+</Project>

@@ -1,0 +1,17 @@
+profile = "default"
+
+[msbuild]
+project = ["./FactoriOTel/FactoriOTel.csproj"]
+
+[msbuild.properties]
+TargetFramework = "net8.0"
+
+[[pack]]
+# Invalid RIDs
+rid = ["win-arm", "rhel-x64"]
+publish = false
+
+[github]
+user = "FactorioSharp"
+repo = "FactorioSharp.Instrumentation"
+version_prefix = "v"
