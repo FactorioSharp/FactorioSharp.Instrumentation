@@ -19,19 +19,28 @@ static class FactorioGameInstruments
 
     static void SetupGameInstruments(Meter meter, FactorioGameData gameData, Dictionary<string, object?> tags)
     {
-        meter.CreateObservableUpDownCounter("factorio.server.player.count", () => gameData.Players.Count, null, "The number of players on the factorio server", tags);
         meter.CreateObservableUpDownCounter(
-            "factorio.server.connected_player.count",
-            () => gameData.Players.Count(kv => kv.Value.IsOnline),
-            null,
-            "The number of players currently connected to the factorio server",
-            tags
+            "factorio.game.player",
+            () => new Measurement<long>(gameData.Players.Count, tags),
+            "{player}",
+            "The number of players on the factorio server"
+        );
+        meter.CreateObservableUpDownCounter(
+            "factorio.game.player.connected",
+            () => new Measurement<long>(gameData.Players.Count(kv => kv.Value.IsOnline), tags),
+            "{player}",
+            "The number of players currently connected to the factorio server"
         );
 
-        meter.CreateObservableCounter("factorio.game.tick", () => (long)gameData.Time.Tick, "{tick}", "The current map tick", tags);
-        meter.CreateObservableCounter("factorio.game.tick_played", () => (long)gameData.Time.TicksPlayed, "{tick}", "The number of ticks since the game was created", tags);
-        meter.CreateObservableGauge("factorio.game.speed", () => gameData.Time.Speed, "{tick}", "The speed to update the map at", tags);
-        meter.CreateObservableUpDownCounter("factorio.game.paused", () => gameData.Time.Paused ? 1 : 0, "{tick}", "Is the game paused ?", tags);
+        meter.CreateObservableCounter("factorio.game.tick", () => new Measurement<long>(gameData.Time.Tick, tags), "{tick}", "The current map tick");
+        meter.CreateObservableCounter(
+            "factorio.game.tick.played",
+            () => new Measurement<long>(gameData.Time.TicksPlayed, tags),
+            "{tick}",
+            "The number of ticks since the game was created"
+        );
+        meter.CreateObservableGauge("factorio.game.tick.speed_ratio", () => new Measurement<float>(gameData.Time.Speed, tags), "{tick}", "The speed to update the map at");
+        meter.CreateObservableUpDownCounter("factorio.game.tick.paused", () => new Measurement<int>(gameData.Time.Paused ? 1 : 0, tags), "{tick}", "Is the game paused ?");
     }
 
     static void SetupMineableResourceInstruments(Meter meter, FactorioGameData gameData, IDictionary<string, object?> baseTags) =>
