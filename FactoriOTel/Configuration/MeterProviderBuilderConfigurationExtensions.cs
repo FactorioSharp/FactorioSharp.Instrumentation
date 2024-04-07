@@ -30,6 +30,7 @@ static class MeterProviderBuilderConfigurationExtensions
             {
                 options.UriPrefixes = [configuration.Endpoint];
                 options.ScrapeEndpointPath = configuration.ScrapeEndpointPath;
+                options.DisableTotalNameSuffixForCounters = true;
             }
         );
 

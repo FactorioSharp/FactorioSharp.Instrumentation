@@ -14,11 +14,6 @@ class FactorioElectronicNetworkData
     public FactorioFlowData<double> Flow { get; set; } = new();
 
     /// <summary>
-    ///     Buffer per entity in J
-    /// </summary>
-    public Dictionary<string, double> Buffer { get; set; } = new();
-
-    /// <summary>
     ///     Entities count
     /// </summary>
     public Dictionary<string, int> Entities { get; set; } = new();

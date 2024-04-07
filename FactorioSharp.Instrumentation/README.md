@@ -7,7 +7,7 @@ The orchestration is performed by a background service that must be added to the
 
 Note: Emitting traces for the commands that are executed on the RCON is a **WIP**.
 
-## Quick start
+## Getting started
 
 The RCON interface must be enabled when running factorio. It must also be secured using a password.
 Add the following parameters to the factorio launch command: `--rcon-port 27015 --rcon-password factory`

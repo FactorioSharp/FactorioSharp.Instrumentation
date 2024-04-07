@@ -41,21 +41,18 @@ class UpdatePowerJob : Job
             foreach ((uint networkId, Dictionary<string, EntityConsumptionData> entityConsumptions) in surfaceConsumption)
             {
                 FactorioFlowData<double> flow = new();
-                Dictionary<string, double> buffer = new();
                 Dictionary<string, int> entities = new();
 
                 foreach ((string entity, EntityConsumptionData entityConsumption) in entityConsumptions)
                 {
                     flow.Inputs[entity] = entityConsumption.Input;
                     flow.Outputs[entity] = entityConsumption.Output;
-                    buffer[entity] = entityConsumption.Buffer;
                     entities[entity] = entityConsumption.Count;
                 }
 
                 networks[networkId] = new FactorioElectronicNetworkData
                 {
                     Flow = flow,
-                    Buffer = buffer,
                     Entities = entities
                 };
             }
@@ -112,8 +109,7 @@ class UpdatePowerJob : Job
                             result[entity] = {}
                         end
                         
-                        result[entity].input = statistics.get_flow_count{ name = entity, input = true, precision_index = defines.flow_precision_index.five_seconds, sample_index = 1 }
-                        result[entity].all_time_input = statistics.input_counts[entity]
+                        result[entity].input = statistics.input_counts[entity]
                     end
                     
                     for entity, _ in pairs(statistics.output_counts) do
@@ -121,14 +117,7 @@ class UpdatePowerJob : Job
                             result[entity] = {}
                         end
                         
-                        result[entity].output = statistics.get_flow_count{ name = entity, input = false, precision_index = defines.flow_precision_index.five_seconds, sample_index = 1 }
-                        result[entity].all_time_output = statistics.input_counts[entity]
-                    end
-                    
-                    for entity, _ in pairs(result) do
-                        if (result[entity].all_time_input and result[entity].all_time_output) then
-                            result[entity].buffer = result[entity].all_time_input - result[entity].all_time_output
-                        end
+                        result[entity].output = statistics.output_counts[entity]
                     end
                 else
                     result.invalid = true;
@@ -182,7 +171,6 @@ class UpdatePowerJob : Job
     {
         public double Input { get; set; }
         public double Output { get; set; }
-        public double Buffer { get; set; }
         public int Count { get; set; }
     }
 }
