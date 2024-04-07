@@ -28,11 +28,11 @@ jobs:
 
     - name: Library - Build, Pack and Publish
       shell: bash
-      run: dotnet-releaser run --nuget-token "${{secrets.NUGET_TOKEN}}" --github-token "${{secrets.GITHUB_TOKEN}}" --github-token-extra "${{secrets.API_GITHUB_TOKEN}}" dotnet-releaser.libraries.toml
+      run: dotnet-releaser run --force --nuget-token "${{secrets.NUGET_TOKEN}}" --github-token "${{secrets.GITHUB_TOKEN}}" --github-token-extra "${{secrets.API_GITHUB_TOKEN}}" dotnet-releaser.libraries.toml
 
     - name: Application - Build, Pack and Publish
       shell: bash
-      run: dotnet-releaser run --nuget-token "${{secrets.NUGET_TOKEN}}" --github-token "${{secrets.GITHUB_TOKEN}}" --github-token-extra "${{secrets.API_GITHUB_TOKEN}}" dotnet-releaser.libraries.toml
+      run: dotnet-releaser run --force --nuget-token "${{secrets.NUGET_TOKEN}}" --github-token "${{secrets.GITHUB_TOKEN}}" --github-token-extra "${{secrets.API_GITHUB_TOKEN}}" dotnet-releaser.libraries.toml
       
 permissions:
   contents: write
