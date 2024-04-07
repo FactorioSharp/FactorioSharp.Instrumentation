@@ -170,7 +170,8 @@ static class FactorioGameInstruments
                                 {
                                     { "factorio.surface", surfaceKv.Key },
                                     { "factorio.network", networkKv.Key },
-                                    { "factorio.entity", entityKv.Key }
+                                    { "factorio.entity", entityKv.Key },
+                                    { "factorio.entity.type", gameData.ElectricEntities[entityKv.Key].Type }
                                 }
                             )
                         )
@@ -193,7 +194,8 @@ static class FactorioGameInstruments
                                 {
                                     { "factorio.surface", surfaceKv.Key },
                                     { "factorio.network", networkKv.Key },
-                                    { "factorio.entity", entityKv.Key }
+                                    { "factorio.entity", entityKv.Key },
+                                    { "factorio.entity.type", gameData.ElectricEntities[entityKv.Key].Type }
                                 }
                             )
                         )
@@ -216,7 +218,8 @@ static class FactorioGameInstruments
                                 {
                                     { "factorio.surface", surfaceKv.Key },
                                     { "factorio.network", networkKv.Key },
-                                    { "factorio.entity", entityKv.Key }
+                                    { "factorio.entity", entityKv.Key },
+                                    { "factorio.entity.type", gameData.ElectricEntities[entityKv.Key].Type }
                                 }
                             )
                         )
@@ -263,7 +266,8 @@ static class FactorioGameInstruments
                                 {
                                     { "factorio.surface", surfaceKv.Key },
                                     { "factorio.network", networkKv.Key },
-                                    { "factorio.entity", entityKv.Key }
+                                    { "factorio.entity", entityKv.Key },
+                                    { "factorio.entity.type", gameData.ElectricEntities[entityKv.Key].Type }
                                 }
                             )
                         )
@@ -286,7 +290,8 @@ static class FactorioGameInstruments
                                 {
                                     { "factorio.surface", surfaceKv.Key },
                                     { "factorio.network", networkKv.Key },
-                                    { "factorio.entity", entityKv.Key }
+                                    { "factorio.entity", entityKv.Key },
+                                    { "factorio.entity.type", gameData.ElectricEntities[entityKv.Key].Type }
                                 }
                             )
                         )
@@ -309,7 +314,8 @@ static class FactorioGameInstruments
                                 {
                                     { "factorio.surface", surfaceKv.Key },
                                     { "factorio.network", networkKv.Key },
-                                    { "factorio.entity", entityKv.Key }
+                                    { "factorio.entity", entityKv.Key },
+                                    { "factorio.entity.type", gameData.ElectricEntities[entityKv.Key].Type }
                                 }
                             )
                         )
@@ -332,7 +338,8 @@ static class FactorioGameInstruments
                                 {
                                     { "factorio.surface", surfaceKv.Key },
                                     { "factorio.network", networkKv.Key },
-                                    { "factorio.entity", entityKv.Key }
+                                    { "factorio.entity", entityKv.Key },
+                                    { "factorio.entity.type", gameData.ElectricEntities[entityKv.Key].Type }
                                 }
                             )
                         )
