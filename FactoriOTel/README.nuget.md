@@ -2,13 +2,13 @@
 
 This tool connects to one or many Factorio servers through RCON, reads their data periodically and expose them through OpenTelemetry exporters.
 
-See also the [FactorioSharp.Instrumentation](https://github.com/FactorioSharp/FactorioSharp.Instrumentation) nuget to integrate the instrumentation tools to an existing application.
+See also the [FactorioSharp.Instrumentation](https://github.com/FactorioSharp/FactorioSharp.Instrumentation/tree/main/FactorioSharp.Instrumentation) nuget to integrate the instrumentation tools to an existing application.
 
 ## Getting Started
 
 Get the FactoriOTel application:
 - using the .NET CLI: `dotnet tool install --global FactoriOTel`
-- or from this repository [releases](https://github.com/FactorioSharp/FactoriOTel/releases)
+- or from this repository [releases](https://github.com/FactorioSharp/FactorioSharp.Instrumentation/releases)
 
 Create a `config.yml` file:
 ```yml
@@ -31,7 +31,7 @@ FactoriOTel config.yml
 ## Usage
 
 ```
-FactoriOTel 0.0.0-alpha.0.3+90824d614d22ff56602bebff226cfc1da50a11ad
+FactoriOTel 0.3.2+ee48cd9bfa2e6847a40f1be1820ca4a82974c351
 Copyright (c) 2024 Ismail Bennani
 USAGE:
 Run using configuration from config.yml:
@@ -46,7 +46,7 @@ Run using configuration from config.yml:
 
 ## Configuration file
 
-See [config.example.yml](https://github.com/FactorioSharp/FactoriOTel/blob/main/config.example.yml).
+See [config.example.yml](https://github.com/FactorioSharp/FactorioSharp.Instrumentation/blob/main/FactoriOTel/config.example.yml).
 
 The file is expected to have the following structure.
 
@@ -82,7 +82,7 @@ rcon-endpoint: <uri>
 rcon-password: <string>
 ```
 
-See [FactorioSharp.Instrumentation](https://github.com/FactorioSharp/FactorioSharp.Instrumentation)
+See [FactorioSharp.Instrumentation](https://github.com/FactorioSharp/FactorioSharp.Instrumentation/tree/main/FactorioSharp.Instrumentation)
 
 ### `<prometheus_config>`
 
