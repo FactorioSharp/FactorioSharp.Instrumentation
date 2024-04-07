@@ -159,7 +159,7 @@ static class FactorioGameInstruments
     static void SetupElectricNetworkInstruments(Meter meter, FactorioGameData gameData, IDictionary<string, object?> baseTags)
     {
         meter.CreateObservableUpDownCounter(
-            "factorio.game.energy.input",
+            "factorio.game.electricity.input",
             () => gameData.Surfaces.SelectMany(
                 surfaceKv => surfaceKv.Value.ElectricNetworks.SelectMany(
                     networkKv => networkKv.Value.Flow.Inputs.Select(
@@ -178,11 +178,11 @@ static class FactorioGameInstruments
                 )
             ),
             "J/tick",
-            "The current power being produced"
+            "The current electricity being produced"
         );
 
         meter.CreateObservableUpDownCounter(
-            "factorio.game.energy.output",
+            "factorio.game.electricity.output",
             () => gameData.Surfaces.SelectMany(
                 surfaceKv => surfaceKv.Value.ElectricNetworks.SelectMany(
                     networkKv => networkKv.Value.Flow.Outputs.Select(
@@ -201,11 +201,11 @@ static class FactorioGameInstruments
                 )
             ),
             "J/tick",
-            "The current power being produced"
+            "The current electricity being produced"
         );
 
         meter.CreateObservableUpDownCounter(
-            "factorio.game.energy.buffer",
+            "factorio.game.electricity.buffer",
             () => gameData.Surfaces.SelectMany(
                 surfaceKv => surfaceKv.Value.ElectricNetworks.SelectMany(
                     networkKv => networkKv.Value.Buffer.Select(
@@ -224,7 +224,123 @@ static class FactorioGameInstruments
                 )
             ),
             "J",
-            "The current power being produced"
+            "The current electricity being produced"
+        );
+
+        meter.CreateObservableUpDownCounter(
+            "factorio.game.electricity.entity",
+            () => gameData.Surfaces.SelectMany(
+                surfaceKv => surfaceKv.Value.ElectricNetworks.SelectMany(
+                    networkKv => networkKv.Value.Entities.Select(
+                        entityKv => new Measurement<double>(
+                            entityKv.Value,
+                            baseTags.Concat(
+                                new Dictionary<string, object?>
+                                {
+                                    { "factorio.surface", surfaceKv.Key },
+                                    { "factorio.network", networkKv.Key },
+                                    { "factorio.entity", entityKv.Key },
+                                    { "factorio.entity.type", gameData.ElectricEntities[entityKv.Key].Type }
+                                }
+                            )
+                        )
+                    )
+                )
+            ),
+            "{entity}",
+            "The number of entities producing and consuming electricity"
+        );
+
+        meter.CreateObservableUpDownCounter(
+            "factorio.game.electricity.input.min",
+            () => gameData.Surfaces.SelectMany(
+                surfaceKv => surfaceKv.Value.ElectricNetworks.SelectMany(
+                    networkKv => networkKv.Value.Entities.Select(
+                        entityKv => new Measurement<double>(
+                            entityKv.Value * gameData.ElectricEntities[entityKv.Key].MinEnergyUsage,
+                            baseTags.Concat(
+                                new Dictionary<string, object?>
+                                {
+                                    { "factorio.surface", surfaceKv.Key },
+                                    { "factorio.network", networkKv.Key },
+                                    { "factorio.entity", entityKv.Key }
+                                }
+                            )
+                        )
+                    )
+                )
+            ),
+            "J/tick",
+            "The current electricity being produced"
+        );
+
+        meter.CreateObservableUpDownCounter(
+            "factorio.game.electricity.input.max",
+            () => gameData.Surfaces.SelectMany(
+                surfaceKv => surfaceKv.Value.ElectricNetworks.SelectMany(
+                    networkKv => networkKv.Value.Entities.Select(
+                        entityKv => new Measurement<double>(
+                            entityKv.Value * gameData.ElectricEntities[entityKv.Key].MaxEnergyUsage,
+                            baseTags.Concat(
+                                new Dictionary<string, object?>
+                                {
+                                    { "factorio.surface", surfaceKv.Key },
+                                    { "factorio.network", networkKv.Key },
+                                    { "factorio.entity", entityKv.Key }
+                                }
+                            )
+                        )
+                    )
+                )
+            ),
+            "J/tick",
+            "The current electricity being produced"
+        );
+
+        meter.CreateObservableUpDownCounter(
+            "factorio.game.electricity.output.max",
+            () => gameData.Surfaces.SelectMany(
+                surfaceKv => surfaceKv.Value.ElectricNetworks.SelectMany(
+                    networkKv => networkKv.Value.Entities.Select(
+                        entityKv => new Measurement<double>(
+                            entityKv.Value * gameData.ElectricEntities[entityKv.Key].MaxEnergyProduction,
+                            baseTags.Concat(
+                                new Dictionary<string, object?>
+                                {
+                                    { "factorio.surface", surfaceKv.Key },
+                                    { "factorio.network", networkKv.Key },
+                                    { "factorio.entity", entityKv.Key }
+                                }
+                            )
+                        )
+                    )
+                )
+            ),
+            "J/tick",
+            "The current electricity being produced"
+        );
+
+        meter.CreateObservableUpDownCounter(
+            "factorio.game.electricity.buffer.max",
+            () => gameData.Surfaces.SelectMany(
+                surfaceKv => surfaceKv.Value.ElectricNetworks.SelectMany(
+                    networkKv => networkKv.Value.Entities.Select(
+                        entityKv => new Measurement<double>(
+                            entityKv.Value * gameData.ElectricEntities[entityKv.Key].BufferCapacity,
+                            baseTags.Concat(
+                                new Dictionary<string, object?>
+                                {
+                                    { "factorio.surface", surfaceKv.Key },
+                                    { "factorio.network", networkKv.Key },
+                                    { "factorio.entity", entityKv.Key }
+                                }
+                            )
+                        )
+                    )
+                )
+            ),
+            "J",
+            "The current electricity being produced"
         );
     }
 }

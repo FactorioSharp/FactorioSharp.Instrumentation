@@ -5,6 +5,7 @@ class ElectricEntity
     public string Name { get; set; }
 
     public double BufferCapacity { get; set; }
+    public double MinEnergyUsage { get; set; }
     public double MaxEnergyUsage { get; set; }
     public double MaxEnergyProduction { get; set; }
 

@@ -42,18 +42,21 @@ class UpdatePowerJob : Job
             {
                 FactorioFlowData<double> flow = new();
                 Dictionary<string, double> buffer = new();
+                Dictionary<string, int> entities = new();
 
                 foreach ((string entity, EntityConsumptionData entityConsumption) in entityConsumptions)
                 {
                     flow.Inputs[entity] = entityConsumption.Input;
                     flow.Outputs[entity] = entityConsumption.Output;
                     buffer[entity] = entityConsumption.Buffer;
+                    entities[entity] = entityConsumption.Count;
                 }
 
                 networks[networkId] = new FactorioElectronicNetworkData
                 {
                     Flow = flow,
-                    Buffer = buffer
+                    Buffer = buffer,
+                    Entities = entities
                 };
             }
 
@@ -73,6 +76,7 @@ class UpdatePowerJob : Job
                 }
                 
                 if entity.electric_energy_source_prototype then
+                    result.min_energy_usage = entity.electric_energy_source_prototype.drain
                     result.buffer_capacity = entity.electric_energy_source_prototype.buffer_capacity
                 end
                 
@@ -98,32 +102,32 @@ class UpdatePowerJob : Job
     {
         string result = await client.LowLevelClient.ExecuteAsync(
             """
-            local function get_network_data(entity)
-                local result = { buffer = entity.electric_buffer_size }
-                local statistics = entity.electric_network_statistics
+            local function get_network_data(pole_entity)
+                local result = {}
+                local statistics = pole_entity.electric_network_statistics
                 
                 if statistics then
-                    for k, _ in pairs(statistics.input_counts) do
-                        if not result[k] then
-                            result[k] = {}
+                    for entity, _ in pairs(statistics.input_counts) do
+                        if not result[entity] then
+                            result[entity] = {}
                         end
                         
-                        result[k].input = statistics.get_flow_count{ name = k, input = true, precision_index = defines.flow_precision_index.five_seconds, sample_index = 1 }
-                        result[k].all_time_input = statistics.input_counts[k]
+                        result[entity].input = statistics.get_flow_count{ name = entity, input = true, precision_index = defines.flow_precision_index.five_seconds, sample_index = 1 }
+                        result[entity].all_time_input = statistics.input_counts[entity]
                     end
                     
-                    for k, _ in pairs(statistics.output_counts) do
-                        if not result[k] then
-                            result[k] = {}
+                    for entity, _ in pairs(statistics.output_counts) do
+                        if not result[entity] then
+                            result[entity] = {}
                         end
                         
-                        result[k].output = statistics.get_flow_count{ name = k, input = false, precision_index = defines.flow_precision_index.five_seconds, sample_index = 1 }
-                        result[k].all_time_output = statistics.input_counts[k]
+                        result[entity].output = statistics.get_flow_count{ name = entity, input = false, precision_index = defines.flow_precision_index.five_seconds, sample_index = 1 }
+                        result[entity].all_time_output = statistics.input_counts[entity]
                     end
                     
-                    for k, _ in pairs(result) do
-                        if (result[k].all_time_input and result[k].all_time_output) then
-                            result[k].buffer = result[k].all_time_input - result[k].all_time_output
+                    for entity, _ in pairs(result) do
+                        if (result[entity].all_time_input and result[entity].all_time_output) then
+                            result[entity].buffer = result[entity].all_time_input - result[entity].all_time_output
                         end
                     end
                 else
@@ -143,6 +147,26 @@ class UpdatePowerJob : Job
                         surface_result[network_id] = get_network_data(entity)
                     end
                 end;
+                
+                local entities = {}
+                local seen = {}
+                
+                for _, network_result in pairs(surface_result) do
+                    for entity, _ in pairs(network_result) do
+                        if not seen[entity] then
+                            table.insert(entities, entity)
+                            seen[entity] = true
+                        end
+                    end
+                end
+                
+                for _, entity in pairs(surface.find_entities_filtered{ name = entities }) do
+                    if surface_result[entity.electric_network_id][entity.name].count then
+                        surface_result[entity.electric_network_id][entity.name].count = surface_result[entity.electric_network_id][entity.name].count + 1
+                    else
+                        surface_result[entity.electric_network_id][entity.name].count = 1
+                    end
+                end
             
                 result[surface.name] = surface_result
             end
@@ -159,5 +183,6 @@ class UpdatePowerJob : Job
         public double Input { get; set; }
         public double Output { get; set; }
         public double Buffer { get; set; }
+        public int Count { get; set; }
     }
 }
