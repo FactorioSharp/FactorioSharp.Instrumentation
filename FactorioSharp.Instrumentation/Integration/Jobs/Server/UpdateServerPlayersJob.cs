@@ -88,11 +88,11 @@ class UpdateServerPlayersJob : Job
 
             if (!isOnline && data.Game.Players[player].IsOnline)
             {
-                connected.Add(player);
+                disconnected.Add(player);
             }
             else if (isOnline && !data.Game.Players[player].IsOnline)
             {
-                disconnected.Add(player);
+                connected.Add(player);
             }
 
             data.Game.Players[player].IsOnline = isOnline;
