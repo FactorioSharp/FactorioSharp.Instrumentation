@@ -131,7 +131,7 @@ class UpdatePowerJob : Job
                 local surface_result = {}
             
                 for _, entity in pairs(surface.find_entities_filtered{ type = "electric-pole" }) do
-                    local network_id = entity.electric_network_id
+                    local network_id = tostring(entity.electric_network_id)
                     if not surface_result[network_id] then
                         surface_result[network_id] = get_network_data(entity)
                     end
@@ -150,10 +150,13 @@ class UpdatePowerJob : Job
                 end
                 
                 for _, entity in pairs(surface.find_entities_filtered{ name = entities }) do
-                    if surface_result[entity.electric_network_id][entity.name].count then
-                        surface_result[entity.electric_network_id][entity.name].count = surface_result[entity.electric_network_id][entity.name].count + 1
-                    else
-                        surface_result[entity.electric_network_id][entity.name].count = 1
+                    local network_id = tostring(entity.electric_network_id)
+                    if surface_result[network_id] and surface_result[network_id][entity.name] then
+                        if surface_result[network_id][entity.name].count then
+                            surface_result[network_id][entity.name].count = surface_result[network_id][entity.name].count + 1
+                        else
+                            surface_result[network_id][entity.name].count = 1
+                        end
                     end
                 end
             
